@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "738229361823",
+    "project_id": "trainingpods-343fa",
+    "storage_bucket": "trainingpods-343fa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738229361823:android:8c14f93d94caf4df3816aa",
+        "android_client_info": {
+          "package_name": "com.example.trainingpods"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "738229361823-d7mpf77v8g8unbb148tkodtopv385bgq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDh2tih1Agh9Q20Lo2C-bD9v7p60PIXaMw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "738229361823-d7mpf77v8g8unbb148tkodtopv385bgq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "738229361823-em5ncjhdr5vas4v401hcgj0vnsu29ig9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.trainingpods"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
