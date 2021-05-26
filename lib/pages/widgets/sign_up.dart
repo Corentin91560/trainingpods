@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:trainingpods/theme.dart';
+import 'package:trainingpods/utils/authentication.dart';
 import 'package:trainingpods/widgets/snackbar.dart';
 
 class SignUp extends StatefulWidget {
@@ -141,7 +143,6 @@ class _SignUpState extends State<SignUp> {
                             hintStyle: const TextStyle(
                                 fontFamily: 'WorkSansSemiBold', fontSize: 16.0),
                             suffixIcon: GestureDetector(
-                              onTap: _toggleSignup,
                               child: Icon(
                                 _obscureTextPassword
                                     ? FontAwesomeIcons.eye
@@ -244,7 +245,9 @@ class _SignUpState extends State<SignUp> {
                           fontFamily: 'WorkSansBold'),
                     ),
                   ),
-                  onPressed: () => _toggleSignUpButton(),
+                  onPressed: () => {
+                    Authentication.signUp(context: context,email: signupEmailController.text,password: signupPasswordController.text),
+                    _toggleSignUpButton()},
                 ),
               )
             ],
@@ -269,4 +272,5 @@ class _SignUpState extends State<SignUp> {
       _obscureTextConfirmPassword = !_obscureTextConfirmPassword;
     });
   }
+
 }
