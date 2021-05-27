@@ -1,17 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:trainingpods/pages/login_page.dart';
 import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/authentication.dart';
-import 'package:trainingpods/widgets/snackbar.dart';
 
 class UserInfoScreen extends StatefulWidget {
-  const UserInfoScreen({Key key, User user})
+  const UserInfoScreen({Key key, User user,String username})
       : _user = user,
+        _username = username,
         super(key: key);
 
   final User _user;
+  final String _username;
 
   @override
   _UserInfoScreenState createState() => _UserInfoScreenState();
@@ -19,6 +19,7 @@ class UserInfoScreen extends StatefulWidget {
 
 class _UserInfoScreenState extends State<UserInfoScreen> {
   User _user;
+  String _username;
   bool _isSigningOut = false;
 
   Route _routeToSignInScreen() {
@@ -43,6 +44,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   @override
   void initState() {
     _user = widget._user;
+    _username = widget._username;
 
     super.initState();
   }
@@ -99,7 +101,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
               ),
               SizedBox(height: 8.0),
               Text(
-                '_user.displayName',
+                _username??_user.displayName ,
                 style: TextStyle(
                   color: CustomTheme.white,
                   fontSize: 26,

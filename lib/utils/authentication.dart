@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,16 +9,27 @@ import 'package:trainingpods/pages/home_page.dart';
 import 'package:trainingpods/widgets/snackbar.dart';
 
 class Authentication {
+
   static Future<FirebaseApp> initializeFirebase(BuildContext context) async {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
 
     User user = FirebaseAuth.instance.currentUser;
+    String username;
 
     if (user != null) {
+      await FirebaseFirestore.instance.collection("user")
+          .where("email",isEqualTo: user.email.toLowerCase())
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          username = doc["name"];
+        });
+      });
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => UserInfoScreen(
             user: user,
+            username: username,
           ),
         ),
       );
@@ -26,7 +38,51 @@ class Authentication {
     return firebaseApp;
   }
 
-  static Future<void> signUp({BuildContext context, String email,String password}) async {
+  static Future<User> signIn({BuildContext context, String email, String password}) async {
+    User user;
+    String username;
+
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password
+      );
+      user = userCredential.user;
+
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        CustomSnackBar(
+          context,
+          const Text('No user found for that email.'),
+        );
+      } else if (e.code == 'wrong-password') {
+        CustomSnackBar(
+          context,
+          const Text('Wrong password provided for that user.'),
+        );
+      }
+    }
+    await FirebaseFirestore.instance.collection("user")
+        .where("email",isEqualTo: email.toLowerCase())
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        username = doc["name"];
+        print(doc["name"]);
+      });
+    });
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => UserInfoScreen(
+          user: user,
+          username: username,
+        ),
+      ),
+    );
+  }
+
+  static Future<void> signUp({BuildContext context, String email, String password, String name}) async {
     User user;
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -34,10 +90,19 @@ class Authentication {
               email: email,
               password: password);
       user = userCredential.user;
+
+      await FirebaseFirestore.instance.collection("user")
+          .add({
+            "email" : email,
+            "name" : name
+          })
+          .then((value) => print(value));
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => UserInfoScreen(
             user: user,
+            username: name,
           ),
         ),
       );

@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:trainingpods/pages/login_page.dart';
 import 'package:trainingpods/theme.dart';
+import 'package:trainingpods/utils/api.dart';
 import 'package:trainingpods/utils/authentication.dart';
 import 'package:trainingpods/widgets/google_sign_in_button.dart';
 import 'package:trainingpods/widgets/snackbar.dart';
@@ -22,6 +25,7 @@ class _SignInState extends State<SignIn> {
   final FocusNode focusNodeEmail = FocusNode();
   final FocusNode focusNodePassword = FocusNode();
 
+
   bool _obscureTextPassword = true;
 
   @override
@@ -33,6 +37,8 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
+    Future<User> user;
+    var api;
     return Container(
       padding: const EdgeInsets.only(top: 23.0),
       child: Column(
@@ -166,12 +172,8 @@ class _SignInState extends State<SignIn> {
                     ),
                   ),
                   onPressed: () =>{
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      ),
-                      CustomSnackBar(
-                      context, const Text('Login button pressed'), ),
+                    Authentication.signIn(context: context,email: loginEmailController.text, password: loginPasswordController.text)
+
                   },
                 ),
               ),

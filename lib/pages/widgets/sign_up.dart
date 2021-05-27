@@ -246,7 +246,7 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                   onPressed: () => {
-                    Authentication.signUp(context: context,email: signupEmailController.text,password: signupPasswordController.text),
+                    Authentication.signUp(context: context,email: signupEmailController.text,password: signupPasswordController.text, name:signupNameController.text ),
                     _toggleSignUpButton()},
                 ),
               )
