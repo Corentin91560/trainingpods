@@ -5,7 +5,7 @@ import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/authentication.dart';
 
 class UserInfoScreen extends StatefulWidget {
-  const UserInfoScreen({Key key, User user,String username})
+  const UserInfoScreen({Key? key, required User user,required String username})
       : _user = user,
         _username = username,
         super(key: key);
@@ -18,8 +18,8 @@ class UserInfoScreen extends StatefulWidget {
 }
 
 class _UserInfoScreenState extends State<UserInfoScreen> {
-  User _user;
-  String _username;
+  late User _user;
+  late String? _username;
   bool _isSigningOut = false;
 
   Route _routeToSignInScreen() {
@@ -73,7 +73,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 child: Material(
                   color: CustomTheme.loginGradientStart,
                   child: Image.network(
-                    _user.photoURL,
+                    _user.photoURL!,
                     fit: BoxFit.fitHeight,
                   ),
                 ),
@@ -101,7 +101,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
               ),
               SizedBox(height: 8.0),
               Text(
-                _username??_user.displayName ,
+                (_username??_user.displayName)! ,
                 style: TextStyle(
                   color: CustomTheme.white,
                   fontSize: 26,

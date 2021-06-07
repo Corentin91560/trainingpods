@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "738229361823",
+    "firebase_url": "https://trainingpods-343fa-default-rtdb.firebaseio.com",
     "project_id": "trainingpods-343fa",
     "storage_bucket": "trainingpods-343fa.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "738229361823-d6k77bi9jktfhcvbaat2hqrss5dafk29.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trainingpods",
+            "certificate_hash": "3b73914c63a2e56054703e144d760c3ff3c3efe5"
+          }
+        },
         {
           "client_id": "738229361823-d7mpf77v8g8unbb148tkodtopv385bgq.apps.googleusercontent.com",
           "client_type": 3

@@ -35,7 +35,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
             });
 
             User user =
-            await Authentication.signInWithGoogle(context: context);
+            (await Authentication.signInWithGoogle(context: context))!;
 
             setState(() {
               _isSigningIn = false;
@@ -45,7 +45,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (context) => UserInfoScreen(
-                    user: user,
+                    user: user, username: user.displayName!,
                   ),
                 ),
               );

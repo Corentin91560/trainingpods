@@ -13,12 +13,12 @@ class Authentication {
   static Future<FirebaseApp> initializeFirebase(BuildContext context) async {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
 
-    User user = FirebaseAuth.instance.currentUser;
-    String username;
+    User? user = FirebaseAuth.instance.currentUser;
+    String username="echec";
 
     if (user != null) {
       await FirebaseFirestore.instance.collection("user")
-          .where("email",isEqualTo: user.email.toLowerCase())
+          .where("email",isEqualTo: user.email!.toLowerCase())
           .get()
           .then((QuerySnapshot querySnapshot) {
         querySnapshot.docs.forEach((doc) {
@@ -38,16 +38,35 @@ class Authentication {
     return firebaseApp;
   }
 
-  static Future<User> signIn({BuildContext context, String email, String password}) async {
+  static Future<User?> signIn({required BuildContext context, required String email, required String password}) async {
     User user;
-    String username;
+    String username="echec";
 
     try {
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
           password: password
       );
-      user = userCredential.user;
+      user = userCredential.user!;
+
+      await FirebaseFirestore.instance.collection("user")
+          .where("email",isEqualTo: email.toLowerCase())
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          username = doc["name"];
+          print(doc["name"]);
+        });
+      });
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => UserInfoScreen(
+            user: user,
+            username: username,
+          ),
+        ),
+      );
 
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -62,34 +81,17 @@ class Authentication {
         );
       }
     }
-    await FirebaseFirestore.instance.collection("user")
-        .where("email",isEqualTo: email.toLowerCase())
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        username = doc["name"];
-        print(doc["name"]);
-      });
-    });
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => UserInfoScreen(
-          user: user,
-          username: username,
-        ),
-      ),
-    );
   }
 
-  static Future<void> signUp({BuildContext context, String email, String password, String name}) async {
+  static Future<void> signUp({required BuildContext context, required String email, required String password, required String name}) async {
     User user;
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: email,
               password: password);
-      user = userCredential.user;
+      user = userCredential.user!;
 
       await FirebaseFirestore.instance.collection("user")
           .add({
@@ -124,7 +126,7 @@ class Authentication {
 
   }
 
-  static Future<void> signOut({BuildContext context}) async {
+  static Future<void> signOut({required BuildContext context}) async {
     final GoogleSignIn googleSignIn = GoogleSignIn();
 
     try {
@@ -140,13 +142,13 @@ class Authentication {
     }
   }
 
-  static Future<User> signInWithGoogle({BuildContext context}) async {
+  static Future<User?> signInWithGoogle({required BuildContext context}) async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    User user;
+    User? user ;
 
     final GoogleSignIn googleSignIn = GoogleSignIn();
 
-    final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAccount googleSignInAccount = (await googleSignIn.signIn())!;
 
     if (googleSignInAccount != null) {
       final GoogleSignInAuthentication googleSignInAuthentication =
@@ -161,7 +163,7 @@ class Authentication {
         final UserCredential userCredential =
             await auth.signInWithCredential(credential);
 
-        user = userCredential.user;
+        user = userCredential.user!;
       } on FirebaseAuthException catch (e) {
         if (e.code == 'account-exists-with-different-credential') {
           CustomSnackBar(
@@ -179,7 +181,7 @@ class Authentication {
       } catch (e) {
         CustomSnackBar(
           context,
-          Text('error $e'),
+          Text(e.toString()),
         );
       }
 

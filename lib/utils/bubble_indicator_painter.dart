@@ -9,14 +9,14 @@ class BubbleIndicatorPainter extends CustomPainter {
       this.dxEntry = 25.0,
       this.radius = 21.0,
       this.dy = 25.0,
-      this.pageController})
+      required this.pageController})
       : super(repaint: pageController) {
     painter = Paint()
       ..color = CustomTheme.white
       ..style = PaintingStyle.fill;
   }
 
-  Paint painter;
+  Paint? painter;
   final double dxTarget;
   final double dxEntry;
   final double radius;
@@ -45,7 +45,7 @@ class BubbleIndicatorPainter extends CustomPainter {
 
     canvas.translate(size.width * pageOffset, 0.0);
     canvas.drawShadow(path, CustomTheme.loginGradientStart, 3.0, true);
-    canvas.drawPath(path, painter);
+    canvas.drawPath(path, painter!);
   }
 
   @override

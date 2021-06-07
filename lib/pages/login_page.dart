@@ -5,7 +5,7 @@ import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/bubble_indicator_painter.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key key}) : super(key: key);
+  const LoginPage({Key ?key}) : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -13,14 +13,14 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
-  PageController _pageController;
+  late PageController _pageController;
 
   Color left = Colors.black;
   Color right = Colors.white;
 
   @override
   void dispose() {
-    _pageController?.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -162,7 +162,7 @@ class _LoginPageState extends State<LoginPage>
   }
 
   void _onSignUpButtonPress() {
-    _pageController?.animateToPage(1,
+    _pageController.animateToPage(1,
         duration: const Duration(milliseconds: 500), curve: Curves.decelerate);
   }
 }
