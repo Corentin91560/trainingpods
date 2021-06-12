@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:trainingpods/pages/home_page.dart';
 import 'package:trainingpods/widgets/snackbar.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class Authentication {
 
@@ -140,6 +141,39 @@ class Authentication {
         const Text('Error signing out. Try again.'),
       );
     }
+  }
+
+  static Future<User?> signInWithFacebook({required BuildContext context}) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? user ;
+
+    try {
+      final AccessToken result = (await FacebookAuth.instance.login()) as AccessToken;
+      final facebookAuthCredential = FacebookAuthProvider.credential(result.token);
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+      user = userCredential.user!;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'account-exists-with-different-credential') {
+        CustomSnackBar(
+          context,
+          const Text(
+              'The account already exists with a different credential.'),
+        );
+      } else if (e.code == 'invalid-credential') {
+        CustomSnackBar(
+          context,
+          const Text(
+              'SError occurred while accessing credentials. Try again.'),
+        );
+      }
+    } catch (e) {
+      CustomSnackBar(
+        context,
+        Text(e.toString()),
+      );
+    }
+
+    return user;
   }
 
   static Future<User?> signInWithGoogle({required BuildContext context}) async {

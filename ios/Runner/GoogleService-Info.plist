@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>738229361823-em5ncjhdr5vas4v401hcgj0vnsu29ig9.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.738229361823-em5ncjhdr5vas4v401hcgj0vnsu29ig9</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>738229361823-d6k77bi9jktfhcvbaat2hqrss5dafk29.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyA8aNtSkRJ0b0ilK-3WI-Tno7z0kaCRTBU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>738229361823</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.trainingpods</string>
+	<key>PROJECT_ID</key>
+	<string>trainingpods-343fa</string>
+	<key>STORAGE_BUCKET</key>
+	<string>trainingpods-343fa.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:738229361823:ios:0a24fe90bd1b31f63816aa</string>
+	<key>DATABASE_URL</key>
+	<string>https://trainingpods-343fa-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

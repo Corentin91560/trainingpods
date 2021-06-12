@@ -6,8 +6,10 @@ import 'package:trainingpods/pages/login_page.dart';
 import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/api.dart';
 import 'package:trainingpods/utils/authentication.dart';
+import 'package:trainingpods/widgets/facebook_sign_in_button.dart';
 import 'package:trainingpods/widgets/google_sign_in_button.dart';
 import 'package:trainingpods/widgets/snackbar.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 import '../home_page.dart';
 
@@ -249,7 +251,12 @@ class _SignInState extends State<SignIn> {
                 if (snapshot.hasError) {
                   return Text('Error initializing Firebase');
                 } else if (snapshot.connectionState == ConnectionState.done) {
-                  return GoogleSignInButton();
+                  return Column(
+                    children: [
+                      FacebookSignInButton(),
+                      GoogleSignInButton()
+                    ],
+                  );
                 }
                 return CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(
