@@ -16,7 +16,7 @@ class _FacebookSignInButtonState extends State<FacebookSignInButton> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.only(bottom: 16.0),
+        padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
         child: _isSigningIn
             ? CircularProgressIndicator (
           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
