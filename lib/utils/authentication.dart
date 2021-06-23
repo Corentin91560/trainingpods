@@ -15,7 +15,7 @@ class Authentication {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
 
     User? user = FirebaseAuth.instance.currentUser;
-    String username="echec";
+    String username= "echec";
 
     if (user != null) {
       await FirebaseFirestore.instance.collection("user")
@@ -96,7 +96,7 @@ class Authentication {
 
       await FirebaseFirestore.instance.collection("user")
           .add({
-            "email" : email,
+            "id" : user.uid,
             "name" : name
           })
           .then((value) => print(value));
@@ -148,10 +148,15 @@ class Authentication {
     User? user ;
 
     try {
-      final AccessToken result = (await FacebookAuth.instance.login()) as AccessToken;
+      final AccessToken result = (await FacebookAuth.instance.login(permissions: ['email', 'public_profile']));
       final facebookAuthCredential = FacebookAuthProvider.credential(result.token);
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
       user = userCredential.user!;
+      await FirebaseFirestore.instance.collection("user")
+          .add({
+        "id" : user.uid,
+        "name" : user.displayName
+      }).then((value) => print(value));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'account-exists-with-different-credential') {
         CustomSnackBar(
@@ -194,10 +199,13 @@ class Authentication {
       );
 
       try {
-        final UserCredential userCredential =
-            await auth.signInWithCredential(credential);
-
+        final UserCredential userCredential = await auth.signInWithCredential(credential);
         user = userCredential.user!;
+        await FirebaseFirestore.instance.collection("user")
+            .add({
+          "id" : user.uid,
+          "name" : user.displayName
+        }).then((value) => print(value));
       } on FirebaseAuthException catch (e) {
         if (e.code == 'account-exists-with-different-credential') {
           CustomSnackBar(
