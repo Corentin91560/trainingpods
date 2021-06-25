@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:trainingpods/pages/login_page.dart';
+import 'package:trainingpods/pages/ui_view/profile_view.dart';
 import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/authentication.dart';
+import 'package:trainingpods/utils/tab_icons_data.dart';
+import 'package:trainingpods/pages/widgets/bottom_bar_view.dart';
 
-class UserInfoScreen extends StatefulWidget {
-  const UserInfoScreen({Key? key, required User user,required String username})
+class OldHome extends StatefulWidget {
+  const OldHome({Key? key, required User user,required String username})
       : _user = user,
         _username = username,
         super(key: key);
@@ -14,10 +17,10 @@ class UserInfoScreen extends StatefulWidget {
   final String _username;
 
   @override
-  _UserInfoScreenState createState() => _UserInfoScreenState();
+  _OldHomeState createState() => _OldHomeState();
 }
 
-class _UserInfoScreenState extends State<UserInfoScreen> {
+class _OldHomeState extends State<OldHome> {
   late User _user;
   late String? _username;
   bool _isSigningOut = false;
@@ -168,6 +171,117 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  @override
+  const HomeScreen({Key? key, required User user,required String username})
+      : _user = user,
+        _username = username,
+        super(key: key);
+
+  final User _user;
+  final String _username;
+
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with TickerProviderStateMixin {
+  late User _user;
+  AnimationController? animationController;
+
+  List<TabIconData> tabIconsList = TabIconData.tabIconsList;
+
+  Widget tabBody = Container(
+    color: CustomTheme.background,
+  );
+
+  @override
+  void initState() {
+    _user = widget._user;
+    tabIconsList.forEach((TabIconData tab) {
+      tab.isSelected = false;
+    });
+    tabIconsList[0].isSelected = true;
+
+    animationController = AnimationController(duration: const Duration(milliseconds: 600), vsync: this);
+    tabBody = ProfileView(user: _user);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    animationController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: CustomTheme.background,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: FutureBuilder<bool>(
+          future: getData(),
+          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+            if (!snapshot.hasData) {
+              return const SizedBox();
+            } else {
+              return Stack(
+                children: <Widget>[
+                  tabBody,
+                  bottomBar(),
+                ],
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<bool> getData() async {
+    await Future<dynamic>.delayed(const Duration(milliseconds: 200));
+    return true;
+  }
+
+  Widget bottomBar() {
+    return Column(
+      children: <Widget>[
+        const Expanded(
+          child: SizedBox(),
+        ),
+        BottomBarView(
+          tabIconsList: tabIconsList,
+          addClick: () {},
+          changeIndex: (int index) {
+            if (index == 0 || index == 2) {
+              animationController?.reverse().then<dynamic>((data) {
+                if (!mounted) {
+                  return;
+                }
+                /*setState(() {
+                  tabBody =
+                      MyDiaryScreen(animationController: animationController);
+                });*/
+              });
+            } else if (index == 1 || index == 3) {
+              animationController?.reverse().then<dynamic>((data) {
+                if (!mounted) {
+                  return;
+                }
+                /*setState(() {
+                  tabBody =
+                      TrainingScreen(animationController: animationController);
+                });*/
+              });
+            }
+          },
+        ),
+      ],
     );
   }
 }

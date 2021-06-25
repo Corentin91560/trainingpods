@@ -28,7 +28,7 @@ class Authentication {
       });
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => UserInfoScreen(
+          builder: (context) => HomeScreen(
             user: user,
             username: username,
           ),
@@ -62,7 +62,7 @@ class Authentication {
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => UserInfoScreen(
+          builder: (context) => HomeScreen(
             user: user,
             username: username,
           ),
@@ -103,7 +103,7 @@ class Authentication {
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => UserInfoScreen(
+          builder: (context) => HomeScreen(
             user: user,
             username: name,
           ),
@@ -144,19 +144,34 @@ class Authentication {
   }
 
   static Future<User?> signInWithFacebook({required BuildContext context}) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    User? user ;
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    User? user;
 
     try {
       final AccessToken result = (await FacebookAuth.instance.login(permissions: ['email', 'public_profile']));
       final facebookAuthCredential = FacebookAuthProvider.credential(result.token);
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
       user = userCredential.user!;
-      await FirebaseFirestore.instance.collection("user")
-          .add({
-        "id" : user.uid,
-        "name" : user.displayName
-      }).then((value) => print(value));
+      String photoUrl = "${user.photoURL}?height=500&access_token=${result.token}";
+      await user.updateProfile(photoURL: photoUrl);
+      print("USER PROFILE PICTURE URL --> ${user.photoURL}");
+
+
+      QuerySnapshot<Map<String, dynamic>> snapshot = await db
+          .collection('user')
+          .limit(1)
+          .where('id', isEqualTo: user.uid)
+          .get();
+      List<QueryDocumentSnapshot> docs = snapshot.docs;
+      if (docs.isEmpty) {
+        await db.collection("user")
+            .add({
+          "id" : user.uid,
+          "name" : user.displayName,
+          "picture" : photoUrl
+        }).then((value) => print(value));
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'account-exists-with-different-credential') {
         CustomSnackBar(
@@ -177,12 +192,12 @@ class Authentication {
         Text(e.toString()),
       );
     }
-
     return user;
   }
 
   static Future<User?> signInWithGoogle({required BuildContext context}) async {
     FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseFirestore db = FirebaseFirestore.instance;
     User? user ;
 
     final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -201,11 +216,21 @@ class Authentication {
       try {
         final UserCredential userCredential = await auth.signInWithCredential(credential);
         user = userCredential.user!;
-        await FirebaseFirestore.instance.collection("user")
-            .add({
-          "id" : user.uid,
-          "name" : user.displayName
-        }).then((value) => print(value));
+
+        QuerySnapshot<Map<String, dynamic>> snapshot = await db
+            .collection('user')
+            .limit(1)
+            .where('id', isEqualTo: user.uid)
+            .get();
+        List<QueryDocumentSnapshot> docs = snapshot.docs;
+        if (docs.isEmpty) {
+          await db.collection("user")
+              .add({
+            "id" : user.uid,
+            "name" : user.displayName,
+            "picture" : user.photoURL
+          }).then((value) => print(value));
+        }
       } on FirebaseAuthException catch (e) {
         if (e.code == 'account-exists-with-different-credential') {
           CustomSnackBar(

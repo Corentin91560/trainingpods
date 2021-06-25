@@ -37,7 +37,7 @@ class _FacebookSignInButtonState extends State<FacebookSignInButton> {
               if (user != null) {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => UserInfoScreen(
+                    builder: (context) => HomeScreen(
                       user: user, username: user.displayName!,
                     ),
                   ),
