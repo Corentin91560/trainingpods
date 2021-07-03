@@ -1,7 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_beautiful_popup/main.dart';
 import 'package:trainingpods/pages/login_page.dart';
 import 'package:trainingpods/pages/ui_view/profile_view.dart';
+import 'package:trainingpods/pages/ui_view/scenarios_administration_view.dart';
+import 'package:trainingpods/pages/ui_view/scoreboard_view.dart';
+import 'package:trainingpods/pages/ui_view/pods_settings_view.dart';
 import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/authentication.dart';
 import 'package:trainingpods/utils/tab_icons_data.dart';
@@ -177,21 +181,17 @@ class _OldHomeState extends State<OldHome> {
 
 class HomeScreen extends StatefulWidget {
   @override
-  const HomeScreen({Key? key, required User user,required String username})
+  const HomeScreen({Key? key, required User user})
       : _user = user,
-        _username = username,
         super(key: key);
 
   final User _user;
-  final String _username;
 
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> {
   late User _user;
-  AnimationController? animationController;
 
   List<TabIconData> tabIconsList = TabIconData.tabIconsList;
 
@@ -205,16 +205,13 @@ class _HomeScreenState extends State<HomeScreen>
     tabIconsList.forEach((TabIconData tab) {
       tab.isSelected = false;
     });
-    tabIconsList[0].isSelected = true;
-
-    animationController = AnimationController(duration: const Duration(milliseconds: 600), vsync: this);
+    tabIconsList[3].isSelected = true;
     tabBody = ProfileView(user: _user);
     super.initState();
   }
 
   @override
   void dispose() {
-    animationController?.dispose();
     super.dispose();
   }
 
@@ -224,28 +221,14 @@ class _HomeScreenState extends State<HomeScreen>
       color: CustomTheme.background,
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: FutureBuilder<bool>(
-          future: getData(),
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            if (!snapshot.hasData) {
-              return const SizedBox();
-            } else {
-              return Stack(
-                children: <Widget>[
-                  tabBody,
-                  bottomBar(),
-                ],
-              );
-            }
-          },
-        ),
-      ),
+        body: Stack(
+          children: <Widget>[
+            tabBody,
+            bottomBar(),
+          ],
+        )
+      )
     );
-  }
-
-  Future<bool> getData() async {
-    await Future<dynamic>.delayed(const Duration(milliseconds: 200));
-    return true;
   }
 
   Widget bottomBar() {
@@ -256,28 +239,71 @@ class _HomeScreenState extends State<HomeScreen>
         ),
         BottomBarView(
           tabIconsList: tabIconsList,
-          addClick: () {},
+          runClick: () async {
+            final popup = BeautifulPopup(
+              context: context,
+              template: TemplateBlueRocket,
+            );
+            //await popup.recolor(Colors.lightGreenAccent);
+            popup.show(
+              title: new Text(
+                "Scenarios",
+                style: TextStyle(fontSize: 35, color: Colors.white, fontFamily: 'RobotoBold'),
+              ),
+              content: new Scaffold(
+
+              ),
+              actions: [
+                popup.button(
+                  label: 'Play',
+                  onPressed: () {
+                    //TODO LANCER LE SCENARIO CHOISI
+                  }
+                ),
+                popup.button(
+                  label: 'Cancel',
+                  onPressed: Navigator.of(context).pop,
+                )
+              ],
+              // bool barrierDismissible = false,
+              // Widget close,
+            );
+          },
           changeIndex: (int index) {
-            if (index == 0 || index == 2) {
-              animationController?.reverse().then<dynamic>((data) {
-                if (!mounted) {
-                  return;
-                }
-                /*setState(() {
-                  tabBody =
-                      MyDiaryScreen(animationController: animationController);
-                });*/
-              });
-            } else if (index == 1 || index == 3) {
-              animationController?.reverse().then<dynamic>((data) {
-                if (!mounted) {
-                  return;
-                }
-                /*setState(() {
-                  tabBody =
-                      TrainingScreen(animationController: animationController);
-                });*/
-              });
+            switch(index) {
+              case 0: {
+                setState(() {
+                  tabBody = ScenariosAdministrationView();
+                  this.tabIconsList[0].isSelected = true;
+                });
+                };
+              break;
+
+              case 1: {
+                setState(() {
+                  tabBody = ScoreboardView();
+                  this.tabIconsList[1].isSelected = true;
+                });
+              }
+              break;
+
+              case 2: {
+                setState(() {
+                  tabBody = PodsSettingsView();
+                  this.tabIconsList[2].isSelected = true;
+                });
+              }
+              break;
+
+              case 3: {
+                setState(() {
+                  tabBody = ProfileView(user: this._user);
+                  this.tabIconsList[3].isSelected = true;
+                });
+              }
+              break;
+              default: {}
+              break;
             }
           },
         ),

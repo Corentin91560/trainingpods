@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,33 +16,28 @@ class Authentication {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
 
     User? user = FirebaseAuth.instance.currentUser;
-    String username= "echec";
 
     if (user != null) {
-      await FirebaseFirestore.instance.collection("user")
-          .where("email",isEqualTo: user.email!.toLowerCase())
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        querySnapshot.docs.forEach((doc) {
-          username = doc["name"];
-        });
-      });
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(
-            user: user,
-            username: username,
+      QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+          .collection('user')
+          .limit(1)
+          .where('id', isEqualTo: user.uid)
+          .get();
+      List<QueryDocumentSnapshot> docs = snapshot.docs;
+      if (docs.isNotEmpty) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(
+                user: user),
           ),
-        ),
-      );
+        );
+      }
     }
-
     return firebaseApp;
   }
 
   static Future<User?> signIn({required BuildContext context, required String email, required String password}) async {
     User user;
-    String username="echec";
 
     try {
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -50,21 +46,10 @@ class Authentication {
       );
       user = userCredential.user!;
 
-      await FirebaseFirestore.instance.collection("user")
-          .where("email",isEqualTo: email.toLowerCase())
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        querySnapshot.docs.forEach((doc) {
-          username = doc["name"];
-          print(doc["name"]);
-        });
-      });
-
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => HomeScreen(
-            user: user,
-            username: username,
+            user: user
           ),
         ),
       );
@@ -87,25 +72,31 @@ class Authentication {
 
   static Future<void> signUp({required BuildContext context, required String email, required String password, required String name}) async {
     User user;
+    final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: email,
               password: password);
       user = userCredential.user!;
+      String delimiter = '@';
+      int lastIndex = email.indexOf(delimiter);
+      final String picture = await firebaseStorage
+          .ref('basicUserPicture.jpg')
+          .getDownloadURL();
 
+
+      user.updateProfile(displayName: email.substring(0,lastIndex ), photoURL: picture);
       await FirebaseFirestore.instance.collection("user")
           .add({
-            "id" : user.uid,
-            "name" : name
+            "id" : user.uid
           })
           .then((value) => print(value));
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => HomeScreen(
-            user: user,
-            username: name,
+            user: user
           ),
         ),
       );
@@ -115,14 +106,16 @@ class Authentication {
           context,
           const Text('The password provided is too weak.'),
         );
+        print('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
         CustomSnackBar(
           context,
           const Text('The account already exists for that email.'),
         );
+        print('The account already exists for that email.');
       }
     } catch (e) {
-      print(e);
+      print(e.toString());
     }
 
   }
@@ -155,7 +148,6 @@ class Authentication {
       user = userCredential.user!;
       String photoUrl = "${user.photoURL}?height=500&access_token=${result.token}";
       await user.updateProfile(photoURL: photoUrl);
-      print("USER PROFILE PICTURE URL --> ${user.photoURL}");
 
 
       QuerySnapshot<Map<String, dynamic>> snapshot = await db
@@ -167,9 +159,7 @@ class Authentication {
       if (docs.isEmpty) {
         await db.collection("user")
             .add({
-          "id" : user.uid,
-          "name" : user.displayName,
-          "picture" : photoUrl
+          "id" : user.uid
         }).then((value) => print(value));
       }
     } on FirebaseAuthException catch (e) {
@@ -226,9 +216,7 @@ class Authentication {
         if (docs.isEmpty) {
           await db.collection("user")
               .add({
-            "id" : user.uid,
-            "name" : user.displayName,
-            "picture" : user.photoURL
+            "id" : user.uid
           }).then((value) => print(value));
         }
       } on FirebaseAuthException catch (e) {
