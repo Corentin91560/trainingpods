@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:trainingpods/pages/login_page.dart';
 import 'package:trainingpods/theme.dart';
-import 'package:trainingpods/utils/api.dart';
 import 'package:trainingpods/utils/authentication.dart';
 import 'package:trainingpods/widgets/facebook_sign_in_button.dart';
 import 'package:trainingpods/widgets/google_sign_in_button.dart';

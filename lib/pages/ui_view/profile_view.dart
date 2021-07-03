@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/authentication.dart';
 import 'package:trainingpods/pages/login_page.dart';
@@ -78,61 +77,77 @@ class MapScreenState extends State<ProfileView>
                   color: Colors.white,
                   child: new Column(
                     children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(top: 20.0),
-                        child:
-                            new Stack(fit: StackFit.loose, children: <Widget>[
-                          new Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: StreamBuilder(
-                                    stream: FirebaseAuth.instance.userChanges(),
-                                    builder: (context, snapshot) {
-                                      this._user = snapshot.data as User;
-                                      return imgChanged
-                                          ? Image.file(
-                                              this.imgFile,
-                                              width: 140,
-                                              height: 140,
-                                              fit: BoxFit.fitHeight,
-                                            )
-                                          : Image.network(
-                                              this._user.photoURL!,
-                                              width: 140,
-                                              height: 140,
-                                              fit: BoxFit.fitHeight,
-                                            );
-                                    }),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                              padding: EdgeInsets.only(top: 90.0, right: 100.0),
-                              child: new Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  GestureDetector(
-                                    child: new CircleAvatar(
-                                      backgroundColor:
-                                          CustomTheme.loginGradientStart,
-                                      radius: 25.0,
-                                      child: new Icon(
-                                        Icons.camera_alt,
-                                        color: Colors.black,
-                                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 20.0),
+                          child:
+                              new Stack(fit: StackFit.loose, children: <Widget>[
+                            new Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: StreamBuilder(
+                                      stream:
+                                          FirebaseAuth.instance.userChanges(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          this._user = snapshot.data as User;
+                                          return imgChanged
+                                              ? Image.file(
+                                                  this.imgFile,
+                                                  width: 140,
+                                                  height: 140,
+                                                  fit: BoxFit.fitHeight,
+                                                )
+                                              : Image.network(
+                                                  this._user.photoURL!,
+                                                  width: 140,
+                                                  height: 140,
+                                                  fit: BoxFit.fitHeight,
+                                                );
+                                        } else {
+                                          return new Image.asset(
+                                            'assets/img/basicUserPicture.jpg',
+                                            width: 140,
+                                            height: 140,
+                                            fit: BoxFit.fitHeight,
+                                          );
+                                        }
+                                      },
                                     ),
-                                    onTap: () => {
-                                      _onImageButtonPressed(
-                                        ImageSource.gallery,
-                                      )
-                                    },
-                                  )
-                                ],
-                              )),
-                        ]),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(top: 90.0, right: 100.0),
+                                child: new Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    GestureDetector(
+                                      child: new CircleAvatar(
+                                        backgroundColor:
+                                            CustomTheme.loginGradientStart,
+                                        radius: 25.0,
+                                        child: new Icon(
+                                          Icons.camera_alt,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      onTap: () => {
+                                        _onImageButtonPressed(
+                                          ImageSource.gallery,
+                                        )
+                                      },
+                                    )
+                                  ],
+                                )),
+                          ]),
+                        ),
                       ),
                       Padding(
                           padding: const EdgeInsets.only(top: 10.0),
@@ -216,7 +231,8 @@ class MapScreenState extends State<ProfileView>
                                       builder: (context, snapshot) {
                                         if (snapshot.data != null) {
                                           this._user = snapshot.data as User;
-                                          this.nameTFController.text = this._user.displayName ?? "";
+                                          this.nameTFController.text =
+                                              this._user.displayName ?? "";
                                         }
                                         return new TextField(
                                           controller: nameTFController,
@@ -260,7 +276,8 @@ class MapScreenState extends State<ProfileView>
                                       builder: (context, snapshot) {
                                         if (snapshot.data != null) {
                                           this._user = snapshot.data as User;
-                                          this.emailTFController.text = this._user.email ?? "";
+                                          this.emailTFController.text =
+                                              this._user.email ?? "";
                                         }
                                         return new TextField(
                                           controller: emailTFController,
@@ -335,7 +352,7 @@ class MapScreenState extends State<ProfileView>
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(20.0))),
                 onPressed: () async {
-                  setState(()  async{
+                  setState(() async {
                     _status = true;
                     FocusScope.of(context).requestFocus(new FocusNode());
                     if ((this._user.displayName != nameTFController.text) ||

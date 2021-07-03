@@ -3,7 +3,7 @@ import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/tab_icons_data.dart';
 import 'package:flutter/material.dart';
 
-import '../../utils/tab_icons_data.dart';
+import 'tab_icons_data.dart';
 
 class BottomBarView extends StatefulWidget {
   const BottomBarView(
@@ -29,6 +29,12 @@ class _BottomBarViewState extends State<BottomBarView>
     );
     animationController?.forward();
     super.initState();
+  }
+
+  @override
+  dispose() {
+    animationController!.dispose(); // you need this
+    super.dispose();
   }
 
   @override

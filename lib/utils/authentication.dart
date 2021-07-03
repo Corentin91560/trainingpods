@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,6 +12,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:trainingpods/pages/home_page.dart';
 import 'package:trainingpods/widgets/snackbar.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 class Authentication {
 
@@ -82,7 +87,7 @@ class Authentication {
       String delimiter = '@';
       int lastIndex = email.indexOf(delimiter);
       final String picture = await firebaseStorage
-          .ref('basicUserPicture.jpg')
+          .ref('basicUserPicture.png')
           .getDownloadURL();
 
 
@@ -146,9 +151,20 @@ class Authentication {
       final facebookAuthCredential = FacebookAuthProvider.credential(result.token);
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
       user = userCredential.user!;
-      String photoUrl = "${user.photoURL}?height=500&access_token=${result.token}";
-      await user.updateProfile(photoURL: photoUrl);
-
+      String photoURL = "";
+      try {
+         photoURL = await FirebaseStorage.instance
+            .ref('profilePictures/${user.uid}.jpeg')
+            .getDownloadURL();
+         await user.updateProfile(photoURL: photoURL);
+      } catch (e) {
+        photoURL = "${user.photoURL}?height=500&access_token=${result.token}";
+        File photofile = await urlToFile(photoURL);
+        await FirebaseStorage.instance
+            .ref('/profilePictures/${user.uid}.jpeg')
+            .putFile(photofile);
+        await user.updateProfile(photoURL: photoURL);
+      }
 
       QuerySnapshot<Map<String, dynamic>> snapshot = await db
           .collection('user')
@@ -242,5 +258,15 @@ class Authentication {
 
       return user;
     }
+  }
+
+  static Future<File> urlToFile(String imageUrl) async {
+    var rng = new Random();
+    Directory tempDir = await getTemporaryDirectory();
+    String tempPath = tempDir.path;
+    File file = new File('$tempPath'+ (rng.nextInt(100)).toString() +'.jpeg');
+    http.Response response = await http.get(Uri.parse(imageUrl));
+    await file.writeAsBytes(response.bodyBytes);
+    return file;
   }
 }
