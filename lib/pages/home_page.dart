@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_beautiful_popup/main.dart';
 import 'package:trainingpods/pages/ui_view/profile_view.dart';
-import 'package:trainingpods/pages/ui_view/scenarios_administration_view.dart';
+import 'package:trainingpods/pages/ui_view/scenarios_administration/scenarios_administration_view.dart';
 import 'package:trainingpods/pages/ui_view/scoreboard_view.dart';
 import 'package:trainingpods/pages/ui_view/pods_settings_view.dart';
 import 'package:trainingpods/theme.dart';
@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
               template: TemplateBlueRocket,
             );
             //popup.primaryColor = Colors.lightGreenAccent;
-            await popup.recolor(Color(0xFF00FF1E));
+            //await popup.recolor(Color(0xFF00FF1E));
             popup.show(
               title: new Text(
                 "Scenarios",
@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
             switch(index) {
               case 0: {
                 setState(() {
-                  tabBody = ScenariosAdministrationView();
+                  tabBody = ScenariosAdministrationView(user: _user,);
                   this.tabIconsList[0].isSelected = true;
                 });
                 };

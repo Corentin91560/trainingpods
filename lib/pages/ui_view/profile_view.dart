@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:trainingpods/utils/globals.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,6 +10,7 @@ import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/authentication.dart';
 import 'package:trainingpods/pages/login_page.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:trainingpods/widgets/snackbar.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key, required User user})
@@ -22,11 +25,12 @@ class ProfileView extends StatefulWidget {
 class MapScreenState extends State<ProfileView>
     with SingleTickerProviderStateMixin {
   bool _status = true;
-  bool _isSigningOut = false;
   bool imgChanged = false;
+  int newPodsCount = -1;
 
   late File imgFile;
   late User _user;
+  late int userPodsCount;
 
   final FocusNode myFocusNode = FocusNode();
   final nameTFController = TextEditingController();
@@ -67,14 +71,14 @@ class MapScreenState extends State<ProfileView>
         body: GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: new Container(
-        color: Colors.white,
+        color: Colors.white24,
         child: new ListView(
           children: <Widget>[
             Column(
               children: <Widget>[
                 new Container(
                   height: 225.0,
-                  color: Colors.white,
+                  color: Colors.white24,
                   child: new Column(
                     children: <Widget>[
                       Expanded(
@@ -88,31 +92,29 @@ class MapScreenState extends State<ProfileView>
                               children: <Widget>[
                                 Expanded(
                                   child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(50),
                                     child: StreamBuilder(
                                       stream:
-                                          FirebaseAuth.instance.userChanges(),
+                                          auth.getInstance().userChanges(),
                                       builder: (context, snapshot) {
+                                        if (!snapshot.hasData) {
+                                          return Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        }
                                         if (snapshot.hasData) {
                                           this._user = snapshot.data as User;
                                           return imgChanged
                                               ? Image.file(
                                                   this.imgFile,
-                                                  width: 140,
-                                                  height: 140,
                                                   fit: BoxFit.fitHeight,
                                                 )
                                               : Image.network(
                                                   this._user.photoURL!,
-                                                  width: 140,
-                                                  height: 140,
                                                   fit: BoxFit.fitHeight,
                                                 );
                                         } else {
                                           return new Image.asset(
                                             'assets/img/basicUserPicture.jpg',
-                                            width: 140,
-                                            height: 140,
                                             fit: BoxFit.fitHeight,
                                           );
                                         }
@@ -124,14 +126,13 @@ class MapScreenState extends State<ProfileView>
                             ),
                             Padding(
                                 padding:
-                                    EdgeInsets.only(top: 90.0, right: 100.0),
+                                    EdgeInsets.only(top: 100.0, right: 120.0),
                                 child: new Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     GestureDetector(
                                       child: new CircleAvatar(
-                                        backgroundColor:
-                                            CustomTheme.loginGradientStart,
+                                        backgroundColor: CustomTheme.loginGradientStart,
                                         radius: 25.0,
                                         child: new Icon(
                                           Icons.camera_alt,
@@ -160,13 +161,7 @@ class MapScreenState extends State<ProfileView>
                                     borderRadius:
                                         new BorderRadius.circular(20.0))),
                             onPressed: () async {
-                              setState(() {
-                                _isSigningOut = true;
-                              });
                               await Authentication.signOut(context: context);
-                              setState(() {
-                                _isSigningOut = false;
-                              });
                               Navigator.of(context)
                                   .pushReplacement(_routeToSignInScreen());
                             },
@@ -175,7 +170,7 @@ class MapScreenState extends State<ProfileView>
                   ),
                 ),
                 new Container(
-                  color: Color(0xffFFFFFF),
+                  color: Colors.white24,
                   child: Padding(
                     padding: EdgeInsets.only(bottom: 25.0),
                     child: new Column(
@@ -227,7 +222,7 @@ class MapScreenState extends State<ProfileView>
                                 new Flexible(
                                   child: StreamBuilder(
                                       stream:
-                                          FirebaseAuth.instance.userChanges(),
+                                          auth.getInstance().userChanges(),
                                       builder: (context, snapshot) {
                                         if (snapshot.data != null) {
                                           this._user = snapshot.data as User;
@@ -254,7 +249,7 @@ class MapScreenState extends State<ProfileView>
                                   mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
                                     new Text(
-                                      'Adresse email',
+                                      'Nombre de pods',
                                       style: TextStyle(
                                           fontSize: 16.0,
                                           fontWeight: FontWeight.bold),
@@ -269,19 +264,51 @@ class MapScreenState extends State<ProfileView>
                             child: new Row(
                               mainAxisSize: MainAxisSize.max,
                               children: <Widget>[
-                                new Flexible(
-                                  child: StreamBuilder(
-                                      stream:
-                                          FirebaseAuth.instance.userChanges(),
+                                Flexible(
+                                  child: FutureBuilder<DocumentSnapshot>(
+                                      future: firestore.getCurrentUser(_user.uid),
                                       builder: (context, snapshot) {
-                                        if (snapshot.data != null) {
-                                          this._user = snapshot.data as User;
-                                          this.emailTFController.text =
-                                              this._user.email ?? "";
+                                        if (!snapshot.hasData) {
+                                          return Center(
+                                            child: CircularProgressIndicator(),
+                                          );
                                         }
-                                        return new TextField(
-                                          controller: emailTFController,
-                                          enabled: !_status,
+                                        int podsCount = 0;
+                                        if (newPodsCount == -1) {
+                                          Map<String, dynamic> data =
+                                              snapshot.data!.data()
+                                                  as Map<String, dynamic>;
+                                          podsCount = data['podsCount'];
+                                        } else {
+                                          podsCount = newPodsCount;
+                                        }
+                                        return Column(
+                                          children: [
+                                            Slider(
+                                              value: podsCount.toDouble(),
+                                              min: 0,
+                                              max: 6,
+                                              divisions: 6,
+                                              label:
+                                                  podsCount.round().toString(),
+                                              activeColor: CustomTheme.loginGradientStart,
+                                              inactiveColor: Colors.grey,
+                                              onChanged: _status
+                                                  ? null
+                                                  : (double value) {
+                                                      setState(() {
+                                                        newPodsCount =
+                                                            value.toInt();
+                                                      });
+                                                    },
+                                            ),
+                                            Text(
+                                              podsCount.toInt().toString(),
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                          ],
                                         );
                                       }),
                                 ),
@@ -306,23 +333,16 @@ class MapScreenState extends State<ProfileView>
         await _picker.getImage(source: source, imageQuality: 100);
     if (pickedFile != null) {
       try {
-        setState(() async {
+
+        imgFile = File(pickedFile.path);
+        await storage.uploadUserProfilePicture(_user.uid, imgFile);
+        String imgURL = await storage.getUserProfilePicture(_user.uid);
+        await _user.updateProfile(photoURL: imgURL);
+        setState(() {
           imgChanged = true;
-          imgFile = File(pickedFile.path);
-          await FirebaseStorage.instance
-              .ref('/profilePictures/${_user.uid}.jpeg')
-              .putFile(imgFile);
-          String imgURL = await FirebaseStorage.instance
-              .ref('profilePictures/${_user.uid}.jpeg')
-              .getDownloadURL();
-          await _user.updateProfile(photoURL: imgURL);
         });
-      } on FirebaseException catch (e) {
-        if (e.code == 'permission-denied') {
-          print('User does not have permission to upload to this reference.');
-        } else {
-          print('No image selected');
-        }
+      } catch (e) {
+        print(e);
       }
     }
   }
@@ -347,29 +367,23 @@ class MapScreenState extends State<ProfileView>
                   child: new ElevatedButton(
                 child: Text('Valider'),
                 style: ElevatedButton.styleFrom(
-                    primary: CustomTheme.TrainingPodsGreen,
+                    primary: CustomTheme.loginGradientStart,
                     onPrimary: Colors.black,
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(20.0))),
                 onPressed: () async {
-                  setState(() async {
+                  if (this._user.displayName != nameTFController.text) {
+                    await this._user.updateProfile(
+                          displayName: this.nameTFController.text,
+                        );
+                    await this._user.reload();
+                  }
+                  if (this.newPodsCount != -1) {
+                    firestore.updateUser(_user.uid, newPodsCount);
+                  }
+                  setState(() {
                     _status = true;
                     FocusScope.of(context).requestFocus(new FocusNode());
-                    if ((this._user.displayName != nameTFController.text) ||
-                        (this._user.email != emailTFController.text)) {
-                      if (this._user.displayName != nameTFController.text) {
-                        await this._user.updateProfile(
-                              displayName: this.nameTFController.text,
-                            );
-                        await this._user.reload();
-                      }
-                      if (this._user.email != emailTFController.text) {
-                        await this._user.updateEmail(
-                              this.emailTFController.text,
-                            );
-                        await this._user.reload();
-                      }
-                    }
                   });
                 },
               )),
@@ -406,7 +420,7 @@ class MapScreenState extends State<ProfileView>
     return new ElevatedButton(
       child: Text('Modifier'),
       style: ElevatedButton.styleFrom(
-          primary: CustomTheme.TrainingPodsRed,
+          primary: CustomTheme.loginGradientStart,
           onPrimary: Colors.black,
           shape: new RoundedRectangleBorder(
               borderRadius: new BorderRadius.circular(20.0))),

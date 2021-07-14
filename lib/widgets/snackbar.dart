@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:trainingpods/theme.dart';
 
 class CustomSnackBar {
   CustomSnackBar(BuildContext context, Widget content,
-      { SnackBarAction? snackBarAction, Color backgroundColor = Colors.green}) {
+      { SnackBarAction? snackBarAction, Color backgroundColor = CustomTheme.TrainingPodsRed}) {
     final SnackBar snackBar = SnackBar(
         action: snackBarAction,
         backgroundColor: backgroundColor,
