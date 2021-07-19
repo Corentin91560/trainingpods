@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:trainingpods/pages/home_page.dart';
 import 'package:trainingpods/pages/login_page.dart';
 import 'package:trainingpods/widgets/snackbar.dart';
@@ -23,10 +24,16 @@ class Authentication {
     if (user != null) {
       var snapshot = await firestore.getCurrentUser(user.uid);
       if (snapshot.exists) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(user: user),
-          ),
+        Navigator.pushReplacement(
+          context,
+          PageTransition(
+              alignment: Alignment.bottomCenter,
+              curve: Curves.easeInOut,
+              duration: Duration(milliseconds: 600),
+              reverseDuration: Duration(milliseconds: 600),
+              type: PageTransitionType.fade,
+              child: HomeScreen(),
+              childCurrent: context.widget),
         );
       }
     }
@@ -44,10 +51,16 @@ class Authentication {
           await auth.signInWithEmailAndPassword(email, password);
       user = userCredential.user!;
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(user: user),
-        ),
+      Navigator.pushReplacement(
+        context,
+        PageTransition(
+            alignment: Alignment.bottomCenter,
+            curve: Curves.easeInOut,
+            duration: Duration(milliseconds: 600),
+            reverseDuration: Duration(milliseconds: 600),
+            type: PageTransitionType.fade,
+            child: HomeScreen(),
+            childCurrent: context.widget),
       );
     } on FirebaseAuthException catch (e) {
       firebaseErrorThrower(e, context);
@@ -75,10 +88,16 @@ class Authentication {
 
       await firestore.createUser(user.uid);
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => LoginPage(),
-        ),
+      Navigator.pushReplacement(
+        context,
+        PageTransition(
+            alignment: Alignment.bottomCenter,
+            curve: Curves.easeInOut,
+            duration: Duration(milliseconds: 600),
+            reverseDuration: Duration(milliseconds: 600),
+            type: PageTransitionType.fade,
+            child: LoginPage(),
+            childCurrent: context.widget),
       );
     } on FirebaseAuthException catch (e) {
       firebaseErrorThrower(e, context);

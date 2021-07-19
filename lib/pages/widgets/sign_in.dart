@@ -38,8 +38,6 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    Future<User> user;
-    var api;
     return Container(
       padding: const EdgeInsets.only(top: 23.0),
       child: Column(

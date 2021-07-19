@@ -13,11 +13,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:trainingpods/widgets/snackbar.dart';
 
 class ProfileView extends StatefulWidget {
-  const ProfileView({Key? key, required User user})
-      : _user = user,
-        super(key: key);
-  final User _user;
-
   @override
   MapScreenState createState() => MapScreenState();
 }
@@ -58,7 +53,7 @@ class MapScreenState extends State<ProfileView>
 
   @override
   void initState() {
-    _user = widget._user;
+    _user = auth.getCurrentUser()!;
     imgFile = new File("");
     nameTFController.text = this._user.displayName!;
     emailTFController.text = this._user.email!;
@@ -68,6 +63,14 @@ class MapScreenState extends State<ProfileView>
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white70,
+        title: Text(
+          "Profil",
+          style: TextStyle(color: Colors.black),
+        ),
+        automaticallyImplyLeading: false,
+      ),
         body: GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: new Container(
