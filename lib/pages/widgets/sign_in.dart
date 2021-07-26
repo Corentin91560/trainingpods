@@ -47,7 +47,7 @@ class _SignInState extends State<SignIn> {
             children: <Widget>[
               Card(
                 elevation: 2.0,
-                color: Colors.white,
+                color: CustomTheme.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -66,12 +66,12 @@ class _SignInState extends State<SignIn> {
                           style: const TextStyle(
                               fontFamily: 'WorkSansSemiBold',
                               fontSize: 16.0,
-                              color: Colors.black),
+                              color: CustomTheme.black),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
                               FontAwesomeIcons.envelope,
-                              color: Colors.black,
+                              color: CustomTheme.black,
                               size: 22.0,
                             ),
                             hintText: 'Email Address',
@@ -86,7 +86,7 @@ class _SignInState extends State<SignIn> {
                       Container(
                         width: 250.0,
                         height: 1.0,
-                        color: Colors.grey[400],
+                        color: CustomTheme.greyBackground,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
@@ -98,13 +98,13 @@ class _SignInState extends State<SignIn> {
                           style: const TextStyle(
                               fontFamily: 'WorkSansSemiBold',
                               fontSize: 16.0,
-                              color: Colors.black),
+                              color: CustomTheme.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: const Icon(
                               FontAwesomeIcons.lock,
                               size: 22.0,
-                              color: Colors.black,
+                              color: CustomTheme.black,
                             ),
                             hintText: 'Password',
                             hintStyle: const TextStyle(
@@ -116,7 +116,7 @@ class _SignInState extends State<SignIn> {
                                     ? FontAwesomeIcons.eye
                                     : FontAwesomeIcons.eyeSlash,
                                 size: 15.0,
-                                color: Colors.black,
+                                color: CustomTheme.black,
                               ),
                             ),
                           ),
@@ -157,7 +157,7 @@ class _SignInState extends State<SignIn> {
                       tileMode: TileMode.clamp),
                 ),
                 child: MaterialButton(
-                  highlightColor: Colors.transparent,
+                  highlightColor: CustomTheme.transparent,
                   splashColor: CustomTheme.loginGradientEnd,
                   child: const Padding(
                     padding:
@@ -165,7 +165,7 @@ class _SignInState extends State<SignIn> {
                     child: Text(
                       'LOGIN',
                       style: TextStyle(
-                          color: Colors.white,
+                          color: CustomTheme.white,
                           fontSize: 25.0,
                           fontFamily: 'WorkSansBold'),
                     ),
@@ -186,7 +186,7 @@ class _SignInState extends State<SignIn> {
                   'Forgot Password?',
                   style: TextStyle(
                       decoration: TextDecoration.underline,
-                      color: Colors.white,
+                      color: CustomTheme.white,
                       fontSize: 16.0,
                       fontFamily: 'WorkSansMedium'),
                 )),
@@ -200,8 +200,8 @@ class _SignInState extends State<SignIn> {
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                         colors: <Color>[
-                          Colors.white10,
-                          Colors.white,
+                          CustomTheme.whiteBackground,
+                          CustomTheme.white,
                         ],
                         begin: FractionalOffset(0.0, 0.0),
                         end: FractionalOffset(1.0, 1.0),
@@ -216,7 +216,7 @@ class _SignInState extends State<SignIn> {
                   child: Text(
                     'Or',
                     style: TextStyle(
-                        color: Colors.white,
+                        color: CustomTheme.white,
                         fontSize: 16.0,
                         fontFamily: 'WorkSansMedium'),
                   ),
@@ -225,8 +225,8 @@ class _SignInState extends State<SignIn> {
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                         colors: <Color>[
-                          Colors.white,
-                          Colors.white10,
+                          CustomTheme.white,
+                          CustomTheme.whiteBackground,
                         ],
                         begin: FractionalOffset(0.0, 0.0),
                         end: FractionalOffset(1.0, 1.0),
@@ -246,7 +246,10 @@ class _SignInState extends State<SignIn> {
               future: Authentication.initializeFirebase(context),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Text('Error initializing Firebase');
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Error initializing Firebase', style: TextStyle(color: CustomTheme.white, fontSize: 16),),
+                  );
                 } else if (snapshot.connectionState == ConnectionState.done) {
                   return Column(
                     children: [

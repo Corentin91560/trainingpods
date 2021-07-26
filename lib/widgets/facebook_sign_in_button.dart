@@ -6,6 +6,8 @@ import 'package:trainingpods/pages/home_page.dart';
 import 'package:trainingpods/utils/authentication.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 
+import '../theme.dart';
+
 class FacebookSignInButton extends StatefulWidget {
   @override
   _FacebookSignInButtonState createState() => _FacebookSignInButtonState();
@@ -20,7 +22,7 @@ class _FacebookSignInButtonState extends State<FacebookSignInButton> {
         padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
         child: _isSigningIn
             ? CircularProgressIndicator (
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          valueColor: AlwaysStoppedAnimation<Color>(CustomTheme.white),
         )
             : SignInButton(
             Buttons.FacebookNew,

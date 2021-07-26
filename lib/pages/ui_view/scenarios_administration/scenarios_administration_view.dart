@@ -1,10 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:trainingpods/models/Scenario.dart';
 import 'package:trainingpods/pages/ui_view/scenarios_administration/create_scenario.dart';
+import 'package:trainingpods/pages/ui_view/scenarios_administration/scenario_details.dart';
 import 'package:trainingpods/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:trainingpods/utils/globals.dart';
@@ -23,7 +23,9 @@ class _ScenariosAdministrationViewState
   @override
   void initState() {
     _user = auth.getCurrentUser()!;
-    getScenarios().then((value) {
+    print(_user.isAnonymous);
+    firestore.getScenarios(_user.uid).then((value) {
+      this.userScenarios = value;
       userScenarios.sort((a, b) => a.difficulty.compareTo(b.difficulty));
       setState(() {});
     });
@@ -34,10 +36,10 @@ class _ScenariosAdministrationViewState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white70,
+        backgroundColor: CustomTheme.whiteAppBarBackground,
         title: Text(
           "Scénarios",
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: CustomTheme.black),
         ),
         automaticallyImplyLeading: false,
         actions: <Widget>[
@@ -60,7 +62,7 @@ class _ScenariosAdministrationViewState
                 child: Icon(
                   Icons.add,
                   size: 26.0,
-                  color: Colors.black,
+                  color: CustomTheme.black,
                 ),
               )),
         ],
@@ -73,75 +75,71 @@ class _ScenariosAdministrationViewState
               itemBuilder: (context, index) {
                 return Card(
                   child: Container(
-                    decoration: new BoxDecoration(
-                        color: Colors.white,
-                        border: Border(
-                            left: BorderSide(
-                          color:
-                              getScenarioColor(userScenarios[index].difficulty),
-                          width: 5,
-                        ))),
-                    child: ListTile(
-                        onTap: () {
-                          setState(() {
-                            print("Scénario $index clicked");
-                          });
-                        },
-                        title: Text(userScenarios[index].name),
-                        subtitle: Row(
-                          children: [
-                            Text(
-                                "Crée le : ${DateFormat('dd/MM/yyyy').format(userScenarios[index].creationDate)}"),
-                            Spacer(),
-                            Text("Joué ${userScenarios[index].played} fois"),
-                          ],
-                        ),
-                        trailing: Icon(Icons.arrow_forward_ios_rounded)),
+                    padding: EdgeInsets.only(left: 12.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(10.0),
+                        bottomRight: Radius.circular(10.0),
+                      ),
+                      color: getScenarioColor(userScenarios[index].difficulty),
+                    ),
+                    child: Container(
+                      decoration: new BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: CustomTheme.white,
+                      ),
+                      child: ListTile(
+                          onTap: () async {
+                            Navigator.pushReplacement(
+                              context,
+                              PageTransition(
+                                alignment: Alignment.bottomCenter,
+                                curve: Curves.easeInOut,
+                                duration: Duration(milliseconds: 300),
+                                reverseDuration: Duration(milliseconds: 300),
+                                type: PageTransitionType.rightToLeft,
+                                child: ScenarioDetails(
+                                  scenario: userScenarios[index],
+                                ),
+                              ),
+                            );
+                            setState(() {});
+                          },
+                          title: Text(userScenarios[index].name),
+                          subtitle: Row(
+                            children: [
+                              Text(
+                                  "Crée le : ${DateFormat('dd/MM/yyyy').format(userScenarios[index].creationDate)}"),
+                              Spacer(),
+                              Text("Joué ${userScenarios[index].played} fois"),
+                            ],
+                          ),
+                          trailing: Icon(Icons.arrow_forward_ios_rounded)),
+                    ),
                   ),
                 );
               }),
         ),
       ),
-      backgroundColor: Colors.white24,
+      backgroundColor: CustomTheme.whiteBackground,
     );
   }
 
   Color getScenarioColor(int difficulty) {
     switch (difficulty) {
       case 1:
-        return CustomTheme.TrainingPodsGreen;
+        return CustomTheme.paleGreen;
         break;
       case 2:
-        return Colors.yellowAccent;
+        return CustomTheme.paleYellow;
         break;
       case 3:
-        return Colors.redAccent;
+        return CustomTheme.paleRed;
         break;
       default:
         {
-          return Colors.white;
+          return CustomTheme.white;
         }
     }
-  }
-
-  Future<void> getScenarios() async {
-    await FirebaseFirestore.instance
-        .collection('user/${_user.uid}/scenarios')
-        .get()
-        .then((event) {
-      if (event.docs.isNotEmpty) {
-        for (var doc in event.docs) {
-          List<int> actions = List.from(doc.data()['actions']);
-          this.userScenarios.add(new Scenario(
-              doc.data()['name'],
-              doc.data()['difficulty'],
-              DateTime.parse(doc.data()['creationDate'].toDate().toString()),
-              doc.data()['played'],
-              actions,
-              doc.data()['bestTime'],
-              doc.data()['podsCount']));
-        }
-      }
-    });
   }
 }

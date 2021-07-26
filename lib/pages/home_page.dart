@@ -2,11 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_beautiful_popup/main.dart';
+import 'package:http/http.dart';
 import 'package:trainingpods/models/Scenario.dart';
+import 'package:trainingpods/pages/ui_view/pods_settings/pods_settings_view.dart';
 import 'package:trainingpods/pages/ui_view/profile_view.dart';
 import 'package:trainingpods/pages/ui_view/scenarios_administration/scenarios_administration_view.dart';
 import 'package:trainingpods/pages/ui_view/scoreboard_view.dart';
-import 'package:trainingpods/pages/ui_view/pods_settings_view.dart';
+import 'package:trainingpods/pages/ui_view/pods_settings/pods_settings_view.dart';
 import 'package:trainingpods/pages/widgets/scenarioPicker.dart';
 import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/globals.dart';
@@ -14,6 +16,12 @@ import 'package:trainingpods/utils/tab_icons_data.dart';
 import 'package:trainingpods/utils/bottom_bar_view.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({int? index})
+      : _index = index ?? 0,
+        super();
+
+  final int _index;
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -24,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<TabIconData> tabIconsList = TabIconData.tabIconsList;
 
   Widget tabBody = Container(
-    color: CustomTheme.background,
+    color: CustomTheme.whiteBackground,
   );
 
   @override
@@ -33,8 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
     tabIconsList.forEach((TabIconData tab) {
       tab.isSelected = false;
     });
-    tabIconsList[0].isSelected = true;
-    tabBody = ScenariosAdministrationView();
+    tabIconsList[widget._index].isSelected = true;
+    tabBody = getView();
     super.initState();
   }
 
@@ -46,15 +54,17 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: CustomTheme.background,
-        child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Stack(
-              children: <Widget>[
-                tabBody,
-                bottomBar(),
-              ],
-            )));
+      color: CustomTheme.whiteBackground,
+      child: Scaffold(
+        backgroundColor: CustomTheme.whiteBackground,
+        body: Stack(
+          children: <Widget>[
+            tabBody,
+            bottomBar(),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget bottomBar() {
@@ -70,8 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
               context: context,
               template: TemplateGreenRocket,
             );
-            //popup.primaryColor = Colors.lightGreenAccent;
-            //await popup.recolor(Color(0xFF00FF1E));
+            popup.primaryColor = CustomTheme.paleGreen;
             getScenarios().then((value) {
               scenarios.sort((a, b) => a.difficulty.compareTo(b.difficulty));
               popup.show(
@@ -79,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Scenarios",
                   style: TextStyle(
                       fontSize: 35,
-                      color: Colors.white,
+                      color: CustomTheme.white,
                       fontFamily: 'RobotoBold'),
                 ),
                 content: scenarioPicker(scenarioList: scenarios),
@@ -140,30 +149,34 @@ class _HomeScreenState extends State<HomeScreen> {
     var userPodsCount = -1;
     scenarios.clear();
 
+    List<Scenario> toRemove = [];
+
     await firestore.getInstance().doc("user/${_user.uid}").get().then((value) {
       Map<String, dynamic> data = value.data()!;
       userPodsCount = data['podsCount'];
     });
 
-    await FirebaseFirestore.instance
-        .collection('user/${_user.uid}/scenarios')
-        .get()
-        .then((event) {
-      if (event.docs.isNotEmpty) {
-        for (var doc in event.docs) {
-          if (doc.data()['podsCount'] == userPodsCount) {
-            List<int> actions = List.from(doc.data()['actions']);
-            this.scenarios.add(new Scenario(
-                doc.data()['name'],
-                doc.data()['difficulty'],
-                DateTime.parse(doc.data()['creationDate'].toDate().toString()),
-                doc.data()['played'],
-                actions,
-                doc.data()['bestTime'],
-                doc.data()['podscount']));
-          }
-        }
+    scenarios = await firestore.getScenarios(_user.uid);
+    for (var s in scenarios) {
+      if (s.podsCount != userPodsCount) {
+        toRemove.add(s);
       }
-    });
+    }
+    scenarios.removeWhere((element) => toRemove.contains(element));
+  }
+
+  Widget getView() {
+    switch (widget._index) {
+      case 0:
+        return ScenariosAdministrationView();
+      case 1:
+        return ScoreboardView();
+      case 2:
+        return PodsSettingsView();
+      case 3:
+        return ProfileView();
+      default:
+        return ScenariosAdministrationView();
+    }
   }
 }

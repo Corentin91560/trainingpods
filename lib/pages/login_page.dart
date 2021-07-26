@@ -15,8 +15,8 @@ class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
   late PageController _pageController;
 
-  Color left = Colors.black;
-  Color right = Colors.white;
+  Color left = CustomTheme.black;
+  Color right = CustomTheme.white;
 
   @override
   void dispose() {
@@ -77,13 +77,13 @@ class _LoginPageState extends State<LoginPage>
                     FocusScope.of(context).requestFocus(FocusNode());
                     if (i == 0) {
                       setState(() {
-                        right = Colors.white;
-                        left = Colors.black;
+                        right = CustomTheme.white;
+                        left = CustomTheme.black;
                       });
                     } else if (i == 1) {
                       setState(() {
-                        right = Colors.black;
-                        left = Colors.white;
+                        right = CustomTheme.black;
+                        left = CustomTheme.white;
                       });
                     }
                   },
@@ -122,7 +122,7 @@ class _LoginPageState extends State<LoginPage>
             Expanded(
               child: TextButton(
                 style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                  overlayColor: MaterialStateProperty.all(CustomTheme.transparent),
                 ),
                 onPressed: _onSignInButtonPress,
                 child: Text(
@@ -134,11 +134,11 @@ class _LoginPageState extends State<LoginPage>
                 ),
               ),
             ),
-            //Container(height: 33.0, width: 1.0, color: Colors.white),
+            //Container(height: 33.0, width: 1.0, color: CustomTheme.white),
             Expanded(
               child: TextButton(
                 style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                  overlayColor: MaterialStateProperty.all(CustomTheme.transparent),
                 ),
                 onPressed: _onSignUpButtonPress,
                 child: Text(

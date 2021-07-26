@@ -47,7 +47,7 @@ class _SignUpState extends State<SignUp> {
             children: <Widget>[
               Card(
                 elevation: 2.0,
-                color: Colors.white,
+                color: CustomTheme.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -68,12 +68,12 @@ class _SignUpState extends State<SignUp> {
                           style: const TextStyle(
                               fontFamily: 'WorkSansSemiBold',
                               fontSize: 16.0,
-                              color: Colors.black),
+                              color: CustomTheme.black),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
                               FontAwesomeIcons.user,
-                              color: Colors.black,
+                              color: CustomTheme.black,
                             ),
                             hintText: 'Name',
                             hintStyle: TextStyle(
@@ -87,7 +87,7 @@ class _SignUpState extends State<SignUp> {
                       Container(
                         width: 250.0,
                         height: 1.0,
-                        color: Colors.grey[400],
+                        color: CustomTheme.greyBackground,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
@@ -100,12 +100,12 @@ class _SignUpState extends State<SignUp> {
                           style: const TextStyle(
                               fontFamily: 'WorkSansSemiBold',
                               fontSize: 16.0,
-                              color: Colors.black),
+                              color: CustomTheme.black),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
                               FontAwesomeIcons.envelope,
-                              color: Colors.black,
+                              color: CustomTheme.black,
                             ),
                             hintText: 'Email Address',
                             hintStyle: TextStyle(
@@ -119,7 +119,7 @@ class _SignUpState extends State<SignUp> {
                       Container(
                         width: 250.0,
                         height: 1.0,
-                        color: Colors.grey[400],
+                        color: CustomTheme.greyBackground,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
@@ -132,12 +132,12 @@ class _SignUpState extends State<SignUp> {
                           style: const TextStyle(
                               fontFamily: 'WorkSansSemiBold',
                               fontSize: 16.0,
-                              color: Colors.black),
+                              color: CustomTheme.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: const Icon(
                               FontAwesomeIcons.lock,
-                              color: Colors.black,
+                              color: CustomTheme.black,
                             ),
                             hintText: 'Password',
                             hintStyle: const TextStyle(
@@ -148,7 +148,7 @@ class _SignUpState extends State<SignUp> {
                                     ? FontAwesomeIcons.eye
                                     : FontAwesomeIcons.eyeSlash,
                                 size: 15.0,
-                                color: Colors.black,
+                                color: CustomTheme.black,
                               ),
                             ),
                           ),
@@ -160,7 +160,7 @@ class _SignUpState extends State<SignUp> {
                       Container(
                         width: 250.0,
                         height: 1.0,
-                        color: Colors.grey[400],
+                        color: CustomTheme.greyBackground,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
@@ -173,12 +173,12 @@ class _SignUpState extends State<SignUp> {
                           style: const TextStyle(
                               fontFamily: 'WorkSansSemiBold',
                               fontSize: 16.0,
-                              color: Colors.black),
+                              color: CustomTheme.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: const Icon(
                               FontAwesomeIcons.lock,
-                              color: Colors.black,
+                              color: CustomTheme.black,
                             ),
                             hintText: 'Confirmation',
                             hintStyle: const TextStyle(
@@ -190,7 +190,7 @@ class _SignUpState extends State<SignUp> {
                                     ? FontAwesomeIcons.eye
                                     : FontAwesomeIcons.eyeSlash,
                                 size: 15.0,
-                                color: Colors.black,
+                                color: CustomTheme.black,
                               ),
                             ),
                           ),
@@ -231,7 +231,7 @@ class _SignUpState extends State<SignUp> {
                       tileMode: TileMode.clamp),
                 ),
                 child: MaterialButton(
-                  highlightColor: Colors.transparent,
+                  highlightColor: CustomTheme.transparent,
                   splashColor: CustomTheme.loginGradientEnd,
                   //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
                   child: const Padding(
@@ -240,7 +240,7 @@ class _SignUpState extends State<SignUp> {
                     child: Text(
                       'SIGN UP',
                       style: TextStyle(
-                          color: Colors.white,
+                          color: CustomTheme.white,
                           fontSize: 25.0,
                           fontFamily: 'WorkSansBold'),
                     ),

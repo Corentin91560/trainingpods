@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:trainingpods/models/Scenario.dart';
 import 'package:trainingpods/pages/ui_view/runner.dart';
+import 'package:trainingpods/utils/globals.dart';
 import '../../theme.dart';
 
 class scenarioPicker extends StatefulWidget {
@@ -28,7 +29,7 @@ class _scenarioPickerState extends State<scenarioPicker> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white24,
+      color: CustomTheme.white,
       child: MediaQuery.removePadding(
         removeTop: true,
         context: context,
@@ -46,21 +47,58 @@ class _scenarioPickerState extends State<scenarioPicker> {
                     crossAxisCount: 3,
                   ),
                   itemBuilder: (context, index) {
-                    return Card(
-                      child: GestureDetector(
+                    return GestureDetector(
+                      onTap: () {
+                        int contextError = 0;
+                        if(pods.length != scenarios[index].podsCount) {
+                          contextError = 1;
+                          errorHandler(contextError);
+                        }
+
+                        for(var pod in pods) {
+                          if(pod.isConnected == false) {
+                            contextError = 2;
+                            errorHandler(contextError);
+                          }
+                        }
+
+                        if(contextError == 0) {
+                          Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                                alignment: Alignment.bottomCenter,
+                                curve: Curves.easeInOut,
+                                duration: Duration(milliseconds: 600),
+                                reverseDuration: Duration(milliseconds: 600),
+                                type: PageTransitionType.fade,
+                                child: Runner(
+                                  pScenario: scenarios[index],
+                                ),
+                                childCurrent: context.widget),
+                          );
+                        } else {
+
+                        }
+                      },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        color: getScenarioColor(scenarios[index].difficulty),
                         child: GridTile(
                           child: Center(
                             child: Column(
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.fromLTRB(5, 2, 5, 0),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(5, 2, 5, 0),
                                   child: Column(
                                     children: [
                                       Text(
                                         scenarios[index].name,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: CustomTheme.black,
                                           fontSize: 10,
                                           fontFamily: 'RobotoBold',
                                         ),
@@ -76,7 +114,7 @@ class _scenarioPickerState extends State<scenarioPicker> {
                                         child: Text(
                                           "Joué ${scenarios[index].played} fois ",
                                           style: TextStyle(
-                                            color: Colors.white,
+                                            color: CustomTheme.black,
                                             fontSize: 10,
                                             fontFamily: 'Roboto',
                                           ),
@@ -85,7 +123,7 @@ class _scenarioPickerState extends State<scenarioPicker> {
                                       Center(
                                         child: Icon(
                                           Icons.play_circle_outlined,
-                                          color: CustomTheme.white,
+                                          color: CustomTheme.black,
                                           size: 20,
                                         ),
                                       )
@@ -96,31 +134,26 @@ class _scenarioPickerState extends State<scenarioPicker> {
                             ),
                           ),
                         ),
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            PageTransition(
-                                alignment: Alignment.bottomCenter,
-                                curve: Curves.easeInOut,
-                                duration: Duration(milliseconds: 600),
-                                reverseDuration: Duration(milliseconds: 600),
-                                type: PageTransitionType.fade,
-                                child: Runner(
-                                  pScenario: scenarios[index],
-                                ),
-                                childCurrent: context.widget),
-                          );
-                        },
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      color: getScenarioColor(scenarios[index].difficulty),
                     );
                   }),
         ),
       ),
     );
+  }
+
+  void errorHandler(int error) {
+    switch(error) {
+      case 1:
+        snackBarCreator(context, "Le nombre de pods connectés ne correspond pas au scénario choisi ");
+        break;
+      case 2:
+        snackBarCreator(context, "Veuillez connecter les pods ");
+        break;
+      default: {
+        snackBarCreator(context, "Une erreur inconnue s'est produite");
+      }
+    }
   }
 
   Color getScenarioColor(int difficulty) {
@@ -136,7 +169,7 @@ class _scenarioPickerState extends State<scenarioPicker> {
         break;
       default:
         {
-          return Colors.white;
+          return CustomTheme.white;
         }
     }
   }

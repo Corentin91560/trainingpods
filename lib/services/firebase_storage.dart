@@ -14,13 +14,13 @@ class firebase_storage {
   }
 
   Future<String> getUserProfilePicture(String userID) async {
-    var picture = await storage.ref('profilePictures/${userID}.png').getDownloadURL();
+    var picture = await storage.ref('profilePictures/${userID}/profilePicture.png').getDownloadURL();
     return picture;
   }
 
   Future<void> uploadUserProfilePicture(String userID, File picture) async {
     await storage
-        .ref('/profilePictures/${userID}.png')
+        .ref('/profilePictures/${userID}/profilePicture.png')
         .putFile(picture);
   }
 }

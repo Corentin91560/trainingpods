@@ -1,11 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../theme.dart';
+
 class ActionsChooser extends StatefulWidget {
-  const ActionsChooser({Key? key, required int podsCount})
+  const ActionsChooser(
+      {Key? key, required int podsCount, required List<int> actions})
       : _podsCount = podsCount,
+        _actions = actions,
         super(key: key);
 
+  final List<int> _actions;
   final int _podsCount;
 
   @override
@@ -20,6 +25,7 @@ class _ActionsChooserState extends State<ActionsChooser> {
   @override
   void initState() {
     this.podsCount = widget._podsCount;
+    this.actions = widget._actions;
     for (int i = 0; i < podsCount; i += 2) {
       pods.add(
         Row(
@@ -33,17 +39,21 @@ class _ActionsChooserState extends State<ActionsChooser> {
               style: ButtonStyle(
                 shape: MaterialStateProperty.all(CircleBorder()),
                 padding: MaterialStateProperty.all(EdgeInsets.all(50)),
-                backgroundColor: MaterialStateProperty.all(Colors.grey[400]),
-                // <-- Button color
+                backgroundColor:
+                    MaterialStateProperty.all(CustomTheme.whiteBackground),
                 overlayColor:
                     MaterialStateProperty.resolveWith<Color?>((states) {
                   if (states.contains(MaterialState.pressed))
-                    return Colors.greenAccent[200]; // <-- Splash color
+                    return CustomTheme.paleGreen;
                 }),
               ),
-              child: Text((i + 1).toString(),
-                  style: TextStyle(
-                      fontSize: 75, fontFamily: 'Roboto', color: Colors.black)),
+              child: Text(
+                (i + 1).toString(),
+                style: TextStyle(
+                    fontSize: 75,
+                    fontFamily: 'Roboto',
+                    color: CustomTheme.black),
+              ),
             ),
             Spacer(),
             i + 1 < podsCount
@@ -56,20 +66,21 @@ class _ActionsChooserState extends State<ActionsChooser> {
                     style: ButtonStyle(
                       shape: MaterialStateProperty.all(CircleBorder()),
                       padding: MaterialStateProperty.all(EdgeInsets.all(50)),
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.grey[400]),
-                      // <-- Button color
+                      backgroundColor: MaterialStateProperty.all(
+                          CustomTheme.whiteBackground),
                       overlayColor:
                           MaterialStateProperty.resolveWith<Color?>((states) {
                         if (states.contains(MaterialState.pressed))
-                          return Colors.greenAccent[200]; // <-- Splash color
+                          return CustomTheme.paleGreen;
                       }),
                     ),
-                    child: Text((i + 2).toString(),
-                        style: TextStyle(
-                            fontSize: 75,
-                            fontFamily: 'Roboto',
-                            color: Colors.black)),
+                    child: Text(
+                      (i + 2).toString(),
+                      style: TextStyle(
+                          fontSize: 75,
+                          fontFamily: 'Roboto',
+                          color: CustomTheme.black),
+                    ),
                   )
                 : Spacer()
           ],
@@ -88,7 +99,7 @@ class _ActionsChooserState extends State<ActionsChooser> {
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(40, 0, 40, 0),
+                  padding: const EdgeInsets.fromLTRB(40, 0, 30, 0),
                   child: Column(
                     children: pods,
                   ),
@@ -97,11 +108,11 @@ class _ActionsChooserState extends State<ActionsChooser> {
                   alignment: FractionalOffset.center,
                   child: CircleAvatar(
                     radius: 30,
-                    backgroundColor: Colors.grey,
+                    backgroundColor: CustomTheme.whiteBackground,
                     child: IconButton(
                       icon: Icon(
                         Icons.undo_rounded,
-                        color: Colors.redAccent,
+                        color: CustomTheme.red,
                       ),
                       onPressed: () {
                         setState(() {
@@ -113,74 +124,49 @@ class _ActionsChooserState extends State<ActionsChooser> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.grey[300]),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        actionsStringBuilder(),
-                        style:
-                            TextStyle(fontSize: 16, fontFamily: "RobotoBold"),
-                        maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
             Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.redAccent,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.close_outlined,
-                        color: Colors.black,
-                        size: 45,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context, [-1]);
-                      },
-                    ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: CustomTheme.paleYellow),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    actionsStringBuilder(),
+                    style: TextStyle(fontSize: 12, fontFamily: "RobotoBold"),
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(25, 0, 0, 0),
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.greenAccent,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.done_outlined,
-                        color: Colors.black,
-                        size: 50,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context, actions);
-                      },
-                    ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 25),
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: CustomTheme.paleGreen,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  icon: Icon(
+                    Icons.done_outlined,
+                    color: CustomTheme.black,
+                    size: 50,
                   ),
+                  onPressed: () {
+                    Navigator.pop(context, actions);
+                  },
                 ),
-              ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
-
 
   String actionsStringBuilder() {
     String actionsString = "";

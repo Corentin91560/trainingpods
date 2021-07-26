@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:trainingpods/models/Scenario.dart';
 import 'package:trainingpods/pages/home_page.dart';
 import 'package:trainingpods/pages/ui_view/scenarios_administration/create_scenarios_actions.dart';
-import 'package:trainingpods/pages/ui_view/scenarios_administration/scenarios_administration_view.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:trainingpods/utils/globals.dart';
+
+import '../../../theme.dart';
 
 class CreateScenario extends StatefulWidget {
   const CreateScenario({Key? key}) : super(key: key);
@@ -19,9 +19,10 @@ class _CreateScenarioState extends State<CreateScenario> {
   String difficultyValue = "Facile";
   int podsCountValue = 0;
   List<int> actionsList = [];
-  final nameController = TextEditingController();
   bool errorVisibility = false;
   String errorText = "";
+
+  final nameController = TextEditingController();
 
   @override
   void initState() {
@@ -31,13 +32,12 @@ class _CreateScenarioState extends State<CreateScenario> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: CustomTheme.whiteBackground,
       appBar: AppBar(
-        backgroundColor: Colors.white70,
+        backgroundColor: CustomTheme.whiteAppBarBackground,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pushReplacement(
-            context,
+          icon: Icon(Icons.arrow_back, color: CustomTheme.black),
+          onPressed: () => Navigator.of(context).pushReplacement(
             PageTransition(
                 alignment: Alignment.bottomCenter,
                 curve: Curves.easeInOut,
@@ -50,7 +50,7 @@ class _CreateScenarioState extends State<CreateScenario> {
         ),
         title: Text(
           "Nouveau Scénario",
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: CustomTheme.black),
         ),
       ),
       body: Padding(
@@ -89,7 +89,7 @@ class _CreateScenarioState extends State<CreateScenario> {
                   ),
                   filled: true,
                   contentPadding: EdgeInsets.all(16),
-                  fillColor: Colors.grey[200],
+                  fillColor: CustomTheme.whiteAppBarBackground,
                 ),
               ),
             ),
@@ -106,46 +106,47 @@ class _CreateScenarioState extends State<CreateScenario> {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
               child: CupertinoSegmentedControl(
-                borderColor: Colors.white,
-                pressedColor: Colors.white,
+                borderColor: CustomTheme.whiteBackground,
+                pressedColor: CustomTheme.whiteBackground,
+                unselectedColor: CustomTheme.whiteBackground,
                 children: {
                   'Facile': Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                       color: difficultyValue == 'Facile'
-                          ? Colors.greenAccent[100]
-                          : Colors.white,
+                          ? CustomTheme.paleGreen
+                          : CustomTheme.whiteBackground,
                     ),
                     padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                     child: Text(
                       'Facile',
-                      style: TextStyle(color: Colors.black, fontSize: 15),
+                      style: TextStyle(color: CustomTheme.black, fontSize: 15),
                     ),
                   ),
                   'Moyen': Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                       color: difficultyValue == 'Moyen'
-                          ? Colors.yellow[100]
-                          : Colors.white,
+                          ? CustomTheme.paleYellow
+                          : CustomTheme.whiteBackground,
                     ),
                     padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                     child: Text(
                       'Moyen',
-                      style: TextStyle(color: Colors.black, fontSize: 15),
+                      style: TextStyle(color: CustomTheme.black, fontSize: 15),
                     ),
                   ),
                   'Difficile': Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                       color: difficultyValue == 'Difficile'
-                          ? Colors.redAccent[100]
-                          : Colors.white,
+                          ? CustomTheme.paleRed
+                          : CustomTheme.whiteBackground,
                     ),
                     padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                     child: Text(
                       'Difficile',
-                      style: TextStyle(color: Colors.black, fontSize: 15),
+                      style: TextStyle(color: CustomTheme.black, fontSize: 15),
                     ),
                   ),
                 },
@@ -187,7 +188,7 @@ class _CreateScenarioState extends State<CreateScenario> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 75, 0, 0),
+              padding: const EdgeInsets.fromLTRB(0, 50, 0, 0),
               child: Text(
                 "Actions :",
                 style: TextStyle(
@@ -197,7 +198,7 @@ class _CreateScenarioState extends State<CreateScenario> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
               child: actionsList.isEmpty
                   ? ElevatedButton(
                       onPressed: () async {
@@ -208,7 +209,7 @@ class _CreateScenarioState extends State<CreateScenario> {
                       },
                       child: Text(
                         "Configurer scénario",
-                        style: TextStyle(color: Colors.black),
+                        style: TextStyle(color: CustomTheme.black),
                       ),
                       style: ElevatedButton.styleFrom(
                           primary: getColor(),
@@ -235,7 +236,7 @@ class _CreateScenarioState extends State<CreateScenario> {
                           },
                           child: Text(
                             "Changer",
-                            style: TextStyle(color: Colors.black),
+                            style: TextStyle(color: CustomTheme.black),
                           ),
                           style: ElevatedButton.styleFrom(
                               primary: getColor(),
@@ -248,21 +249,21 @@ class _CreateScenarioState extends State<CreateScenario> {
                     ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 50),
+              padding: const EdgeInsets.fromLTRB(0,30,0,15),
               child: Visibility(
                 visible: errorVisibility,
                 child: Text(
                   errorText,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.red,
+                    color: CustomTheme.red,
                     fontFamily: 'RobotoBold',
                   ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: ElevatedButton(
                 onPressed: () async {
                   if (actionsList.isEmpty) {
@@ -279,8 +280,9 @@ class _CreateScenarioState extends State<CreateScenario> {
                             0,
                             actionsList,
                             0.0,
-                            podsCountValue),
+                            podsCountValue, []),
                         auth.getCurrentUser()!.uid);
+                    analytics.logEvent(name: "createScenario");
                     Navigator.pushReplacement(
                       context,
                       PageTransition(
@@ -296,13 +298,13 @@ class _CreateScenarioState extends State<CreateScenario> {
                 },
                 child: Text(
                   "Valider",
-                  style: TextStyle(color: Colors.black),
+                  style: TextStyle(color: CustomTheme.black),
                 ),
                 style: ElevatedButton.styleFrom(
                     shape: new RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(30.0),
                     ),
-                    primary: Colors.green,
+                    primary: CustomTheme.green,
                     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                     textStyle: TextStyle(
                       fontSize: 15,
@@ -320,24 +322,28 @@ class _CreateScenarioState extends State<CreateScenario> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ActionsChooser(podsCount: podsCountValue)),
+        builder: (context) => ActionsChooser(
+          podsCount: podsCountValue,
+          actions: actionsList,
+        ),
+      ),
     );
-    if (result[0] != -1) {
+    setState(() {
       actionsList = result as List<int>;
-    }
+    });
   }
 
   Color getColor() {
     switch (difficultyValue) {
       case 'Facile':
-        return Colors.greenAccent[100]!;
+        return CustomTheme.paleGreen;
       case 'Moyen':
-        return Colors.yellow[100]!;
+        return CustomTheme.paleYellow;
       case 'Difficile':
-        return Colors.redAccent[100]!;
+        return CustomTheme.paleRed;
       default:
         {
-          return Colors.black;
+          return CustomTheme.black;
         }
     }
   }

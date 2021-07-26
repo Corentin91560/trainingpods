@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:trainingpods/models/Record.dart';
 import 'package:trainingpods/models/Scenario.dart';
 
 class firebase_firestore {
@@ -49,8 +50,71 @@ class firebase_firestore {
     });
   }
 
+  Future<void> updateScenario(Scenario newScenario, String userID) async {
+    await firestore.doc('user/$userID/scenarios/${newScenario.id}').update({
+      'name': newScenario.name,
+      'difficulty': newScenario.difficulty,
+      'creationDate': newScenario.creationDate,
+      'played': newScenario.played,
+      'actions': newScenario.actions,
+      'bestTime': newScenario.bestTime,
+      'podsCount': newScenario.podsCount
+    });
+  }
+
   void updateUser(String userID, int podsCount) {
     firestore.doc('user/${userID}').update({'podsCount': podsCount});
+  }
+
+  Future<List<Scenario>> getScenarios(String userID) async {
+    List<Scenario> scenarios = [];
+    await FirebaseFirestore.instance
+        .collection('user/$userID/scenarios')
+        .get()
+        .then((scenariosEvent) async {
+      if (scenariosEvent.docs.isNotEmpty) {
+        for (var doc in scenariosEvent.docs) {
+          List<int> actions = List.from(doc.data()['actions']);
+          List<Record> records = [];
+          await FirebaseFirestore.instance
+              .collection('/user/$userID/scenarios/${doc.id}/records')
+              .get()
+              .then((recordsEvent) {
+            for (var record in recordsEvent.docs) {
+              records.add(new Record(
+                  DateTime.parse(record.data()['date'].toDate().toString()),
+                  record.data()['time']));
+            }
+          });
+          scenarios.add(new Scenario(
+              doc.data()['name'],
+              doc.data()['difficulty'],
+              DateTime.parse(doc.data()['creationDate'].toDate().toString()),
+              doc.data()['played'],
+              actions,
+              doc.data()['bestTime'],
+              doc.data()['podsCount'],
+              records,
+              pId: doc.id));
+        }
+      }
+    });
+    return scenarios;
+  }
+
+  Future<void> createRecord(String userID, Scenario scenario, Record recordToAdd) async {
+
+    await firestore.doc("user/$userID/scenarios/${scenario.id}").update({"played" : FieldValue.increment(1)});
+    await firestore.collection("user/$userID/scenarios/${scenario.id}/records").add({
+      'date': recordToAdd.date,
+      'time': recordToAdd.time,
+    });
+  }
+
+  Future<void> deleteScenario(Scenario scenarioToDelete, String userID) async {
+    await firestore
+        .doc("user/$userID/scenarios/${scenarioToDelete.id}")
+        .delete();
   }
 
   FirebaseFirestore getInstance() {

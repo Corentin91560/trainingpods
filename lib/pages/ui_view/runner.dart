@@ -1,12 +1,13 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:trainingpods/models/Record.dart';
 import 'package:trainingpods/models/Scenario.dart';
 import 'package:trainingpods/pages/home_page.dart';
 import 'package:trainingpods/utils/globals.dart';
+import '../../theme.dart';
 
 class Runner extends StatefulWidget {
   const Runner({Key? key, required Scenario pScenario})
@@ -23,48 +24,63 @@ class _RunnerState extends State<Runner> {
   Stopwatch? _stopwatch;
   Timer? _timer;
   late Scenario scenario;
-  int _start = 3;
+  int startCountdown = 4;
+  late List<int> actions;
+  bool finished = false;
 
   @override
   void initState() {
     scenario = widget.scenario;
+    actions = scenario.actions;
     super.initState();
     _stopwatch = Stopwatch();
+    analytics.logEvent(name: "runScenario");
     _timer = new Timer.periodic(new Duration(milliseconds: 30), (timer) {
       if (!mounted) return;
       setState(() {});
     });
   }
 
-  void handleStartStop() async {
-    if (_stopwatch!.isRunning) {
-      _stopwatch!.stop();
-      //TODO STOP SCENARIO
-    } else {
-      startTimer();
-      await new Future.delayed(const Duration(seconds: 3));
-      _stopwatch!.start();
-      //TODO START SCENARIO
+  Future<void> runScenario() async {
+    for (var p in pods) {
+      p.write(0);
     }
-    if (!mounted) return;
-    setState(() {}); // re-render the page
+    for (int a in actions) {
+      await pods[a - 1].run();
+      Future.delayed(const Duration(milliseconds: 100));
+    }
+    endScenario();
+    setState(() {
+      _stopwatch!.stop();
+    });
+  }
+
+  void endScenario() {
+    finished = true;
+    firestore.createRecord(auth.getCurrentUser()!.uid, scenario,
+        Record(DateTime.now(), _stopwatch!.elapsedMilliseconds));
+  }
+
+  Future<void> stopScenario() async {
+    for (var pod in pods) {
+      await pod.write(3);
+    }
   }
 
   void startTimer() {
-
-    _start = 3;
+    startCountdown = 4;
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(
       oneSec,
       (Timer timer) {
         if (!mounted) return;
-        if (_start == 0) {
+        if (startCountdown == 1) {
           setState(() {
             timer.cancel();
           });
         } else {
           setState(() {
-            _start--;
+            startCountdown--;
           });
         }
       },
@@ -80,7 +96,7 @@ class _RunnerState extends State<Runner> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white10,
+      backgroundColor: CustomTheme.greyBackground,
       body: SafeArea(
         child: Stack(
           children: <Widget>[
@@ -93,80 +109,114 @@ class _RunnerState extends State<Runner> {
                   style: TextStyle(
                       fontSize: 48.0,
                       fontFamily: 'RobotoBold',
-                      color: Colors.white),
+                      color: CustomTheme.white),
                   textAlign: TextAlign.center,
                 ),
               ),
             ),
-            Center(
+            Align(
+              alignment: FractionalOffset.center,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  GestureDetector(
-                    child: Icon(
-                      _stopwatch!.isRunning
-                          ? Icons.pause_circle_outlined
-                          : Icons.play_circle_outlined,
-                      color:
-                          _stopwatch!.isRunning ? Colors.yellow : Colors.green,
-                      size: 150,
-                    ),
-                    onTap: handleStartStop,
-                  ),
-                  _start == 0
+                  _stopwatch!.isRunning || finished == true
                       ? Text(
-                          formatTime(_stopwatch!.elapsedMilliseconds),
-                          style: TextStyle(fontSize: 48.0, color: Colors.white),
+                          finished
+                              ? "Scénario terminé\n\nTemps : ${formatTime(_stopwatch!.elapsedMilliseconds)}"
+                              : formatTime(_stopwatch!.elapsedMilliseconds),
+                          style: TextStyle(
+                            fontFamily: 'RobotoBold',
+                            fontSize: 35,
+                            color: CustomTheme.white,
+                          ),
                         )
-                      : Text(
-                          "$_start",
-                          style: TextStyle(fontSize: 60, color: Colors.white),
-                        )
+                      : startCountdown == 4
+                          ? GestureDetector(
+                              child: Icon(
+                                Icons.play_circle_outlined,
+                                color: CustomTheme.paleGreen,
+                                size: 150,
+                              ),
+                              onTap: () async {
+                                startTimer();
+                                await new Future.delayed(
+                                    const Duration(seconds: 4));
+                                _stopwatch!.start();
+                                runScenario();
+                              },
+                            )
+                          : Text(
+                              "$startCountdown",
+                              style: TextStyle(
+                                  fontSize: 60, color: CustomTheme.white),
+                            ),
                 ],
               ),
             ),
             Align(
-              alignment: FractionalOffset.bottomCenter,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  _stopwatch!.isRunning
-                      ? Spacer()
-                      : GestureDetector(
-                          child: Icon(
-                            Icons.stop_circle_outlined,
-                            color: Colors.red,
-                            size: 150,
-                          ),
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              PageTransition(
-                                  alignment: Alignment.bottomCenter,
-                                  curve: Curves.easeInOut,
-                                  duration: Duration(milliseconds: 600),
-                                  reverseDuration: Duration(milliseconds: 600),
-                                  type: PageTransitionType.fade,
-                                  child: HomeScreen(),
-                                  childCurrent: this.widget),
-                            );
-                          },
-                        ),
-                ],
-              ),
-            ),
+                alignment: FractionalOffset.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 25),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      stopScenario().then((value) => Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                                alignment: Alignment.bottomCenter,
+                                curve: Curves.easeInOut,
+                                duration: Duration(milliseconds: 600),
+                                reverseDuration: Duration(milliseconds: 600),
+                                type: PageTransitionType.fade,
+                                child: HomeScreen(),
+                                childCurrent: this.widget),
+                          ));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                        "Quitter",
+                        style: TextStyle(color: CustomTheme.white),
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: CustomTheme.paleRed,
+                      textStyle: TextStyle(
+                        fontSize: 50,
+                        fontFamily: 'RobotoBold',
+                      ),
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(20.0)),
+                    ),
+                  ),
+                ))
           ],
         ),
       ),
     );
   }
-}
 
-String formatTime(int milliseconds) {
-  var secs = milliseconds ~/ 1000;
-  var minutes = ((secs % 3600) ~/ 60).toString().padLeft(2, '0');
-  var seconds = (secs % 60).toString().padLeft(2, '0');
-  var ms = ((milliseconds % 999) % 100).toString().padLeft(2, '0');
+  String formatTime(int milliseconds) {
+    var secs = milliseconds ~/ 1000;
+    var minutes = ((secs % 3600) ~/ 60).toString().padLeft(2, '0');
+    var seconds = (secs % 60).toString().padLeft(2, '0');
+    var ms = ((milliseconds % 999) % 100).toString().padLeft(2, '0');
 
-  return "$minutes:$seconds:$ms";
+    return "$minutes:$seconds:$ms";
+  }
+
+  void finishScenario() {
+    firestore.createRecord(auth.getCurrentUser()!.uid, widget.scenario,
+        new Record(DateTime.now(), _stopwatch!.elapsedMilliseconds));
+    Navigator.pushReplacement(
+      context,
+      PageTransition(
+          alignment: Alignment.bottomCenter,
+          curve: Curves.easeInOut,
+          duration: Duration(milliseconds: 600),
+          reverseDuration: Duration(milliseconds: 600),
+          type: PageTransitionType.fade,
+          child: HomeScreen(),
+          childCurrent: this.widget),
+    );
+  }
 }

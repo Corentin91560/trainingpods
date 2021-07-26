@@ -131,7 +131,7 @@ class _BottomBarViewState extends State<BottomBarView>
             height: 38 + 62.0,
             child: Container(
               alignment: Alignment.topCenter,
-              color: Colors.transparent,
+              color: CustomTheme.transparent,
               child: SizedBox(
                 width: 38 * 2.0,
                 height: 38 * 2.0,
@@ -150,7 +150,7 @@ class _BottomBarViewState extends State<BottomBarView>
                         gradient: LinearGradient(
                             colors: [
                               CustomTheme.loginGradientStart,
-                              CustomTheme.TrainingPodsGreen,
+                              CustomTheme.paleGreen,
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight),
@@ -164,15 +164,15 @@ class _BottomBarViewState extends State<BottomBarView>
                         ],
                       ),
                       child: Material(
-                        color: Colors.transparent,
+                        color: CustomTheme.transparent,
                         child: InkWell(
-                          splashColor: Colors.white.withOpacity(0.1),
-                          highlightColor: Colors.transparent,
-                          focusColor: Colors.transparent,
+                          splashColor: CustomTheme.white.withOpacity(0.1),
+                          highlightColor: CustomTheme.transparent,
+                          focusColor: CustomTheme.transparent,
                           onTap: widget.runClick,
                           child: Icon(
                             Icons.play_arrow,
-                            color: CustomTheme.white,
+                            color: CustomTheme.black,
                             size: 32,
                           ),
                         ),
@@ -237,10 +237,10 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
       aspectRatio: 1,
       child: Center(
         child: InkWell(
-          splashColor: Colors.transparent,
-          focusColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          hoverColor: Colors.transparent,
+          splashColor: CustomTheme.transparent,
+          focusColor: CustomTheme.transparent,
+          highlightColor: CustomTheme.transparent,
+          hoverColor: CustomTheme.transparent,
           onTap: () {
             if (!widget.tabIconData!.isSelected) {
               setAnimation();

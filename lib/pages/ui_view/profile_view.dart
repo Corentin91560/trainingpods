@@ -1,16 +1,13 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:trainingpods/utils/globals.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:trainingpods/theme.dart';
 import 'package:trainingpods/utils/authentication.dart';
 import 'package:trainingpods/pages/login_page.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:trainingpods/widgets/snackbar.dart';
 
 class ProfileView extends StatefulWidget {
   @override
@@ -63,271 +60,285 @@ class MapScreenState extends State<ProfileView>
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white70,
-        title: Text(
-          "Profil",
-          style: TextStyle(color: Colors.black),
+        appBar: AppBar(
+          backgroundColor: CustomTheme.whiteAppBarBackground,
+          title: Text(
+            "Profil",
+            style: TextStyle(color: CustomTheme.black),
+          ),
+          automaticallyImplyLeading: false,
         ),
-        automaticallyImplyLeading: false,
-      ),
+        backgroundColor: CustomTheme.whiteBackground,
         body: GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: new Container(
-        color: Colors.white24,
-        child: new ListView(
-          children: <Widget>[
-            Column(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: new Container(
+            child: new ListView(
               children: <Widget>[
-                new Container(
-                  height: 225.0,
-                  color: Colors.white24,
-                  child: new Column(
-                    children: <Widget>[
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 20.0),
-                          child:
-                              new Stack(fit: StackFit.loose, children: <Widget>[
-                            new Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Expanded(
-                                  child: ClipRRect(
-                                    child: StreamBuilder(
-                                      stream:
-                                          auth.getInstance().userChanges(),
-                                      builder: (context, snapshot) {
-                                        if (!snapshot.hasData) {
-                                          return Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        }
-                                        if (snapshot.hasData) {
-                                          this._user = snapshot.data as User;
-                                          return imgChanged
-                                              ? Image.file(
-                                                  this.imgFile,
-                                                  fit: BoxFit.fitHeight,
-                                                )
-                                              : Image.network(
-                                                  this._user.photoURL!,
-                                                  fit: BoxFit.fitHeight,
-                                                );
-                                        } else {
-                                          return new Image.asset(
-                                            'assets/img/basicUserPicture.jpg',
-                                            fit: BoxFit.fitHeight,
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                                padding:
-                                    EdgeInsets.only(top: 100.0, right: 120.0),
-                                child: new Row(
+                Column(
+                  children: <Widget>[
+                    new Container(
+                      height: 225.0,
+                      color: CustomTheme.whiteBackground,
+                      child: new Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 20.0),
+                              child: new Stack(fit: StackFit.loose, children: <
+                                  Widget>[
+                                new Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    GestureDetector(
-                                      child: new CircleAvatar(
-                                        backgroundColor: CustomTheme.loginGradientStart,
-                                        radius: 25.0,
-                                        child: new Icon(
-                                          Icons.camera_alt,
-                                          color: Colors.black,
+                                    Expanded(
+                                      child: ClipRRect(
+                                        child: StreamBuilder(
+                                          stream:
+                                              auth.getInstance().userChanges(),
+                                          builder: (context, snapshot) {
+                                            if (!snapshot.hasData) {
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            }
+                                            if (snapshot.hasData) {
+                                              this._user =
+                                                  snapshot.data as User;
+                                              return imgChanged
+                                                  ? Image.file(
+                                                      this.imgFile,
+                                                      fit: BoxFit.fitHeight,
+                                                    )
+                                                  : Image.network(
+                                                      this._user.photoURL!,
+                                                      fit: BoxFit.fitHeight,
+                                                    );
+                                            } else {
+                                              return new Image.asset(
+                                                'assets/img/basicUserPicture.jpg',
+                                                fit: BoxFit.fitHeight,
+                                              );
+                                            }
+                                          },
                                         ),
                                       ),
-                                      onTap: () => {
-                                        _onImageButtonPressed(
-                                          ImageSource.gallery,
+                                    ),
+                                  ],
+                                ),
+                                Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 100.0, right: 120.0),
+                                    child: new Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        GestureDetector(
+                                          child: new CircleAvatar(
+                                            backgroundColor:
+                                                CustomTheme.loginGradientStart,
+                                            radius: 25.0,
+                                            child: new Icon(
+                                              Icons.camera_alt,
+                                              color: CustomTheme.black,
+                                            ),
+                                          ),
+                                          onTap: () => {
+                                            _onImageButtonPressed(
+                                              ImageSource.gallery,
+                                            )
+                                          },
                                         )
-                                      },
-                                    )
+                                      ],
+                                    )),
+                              ]),
+                            ),
+                          ),
+                          Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: new ElevatedButton(
+                                child: Text('Se déconnecter'),
+                                style: ElevatedButton.styleFrom(
+                                    primary: CustomTheme.paleRed,
+                                    onPrimary: CustomTheme.black,
+                                    shape: new RoundedRectangleBorder(
+                                        borderRadius:
+                                            new BorderRadius.circular(20.0))),
+                                onPressed: () async {
+                                  await Authentication.signOut(
+                                      context: context);
+                                  Navigator.of(context)
+                                      .pushReplacement(_routeToSignInScreen());
+                                },
+                              ))
+                        ],
+                      ),
+                    ),
+                    new Container(
+                      color: CustomTheme.whiteBackground,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 25.0),
+                        child: new Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                                padding: EdgeInsets.only(
+                                    left: 25.0, right: 25.0, top: 25.0),
+                                child: new Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    new Text(
+                                      'Informations',
+                                      style: TextStyle(
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    _status ? _getEditIcon() : new Container()
                                   ],
                                 )),
-                          ]),
+                            Padding(
+                                padding: EdgeInsets.only(
+                                    left: 25.0, right: 25.0, top: 25.0),
+                                child: new Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    new Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        new Text(
+                                          'Nom',
+                                          style: TextStyle(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )),
+                            Padding(
+                                padding: EdgeInsets.only(
+                                    left: 25.0, right: 25.0, top: 2.0),
+                                child: new Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    new Flexible(
+                                      child: StreamBuilder(
+                                          stream:
+                                              auth.getInstance().userChanges(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.data != null) {
+                                              this._user =
+                                                  snapshot.data as User;
+                                              this.nameTFController.text =
+                                                  this._user.displayName ?? "";
+                                            }
+                                            return new TextField(
+                                              controller: nameTFController,
+                                              enabled: !_status,
+                                              autofocus: !_status,
+                                            );
+                                          }),
+                                    ),
+                                  ],
+                                )),
+                            Padding(
+                                padding: EdgeInsets.only(
+                                    left: 25.0, right: 25.0, top: 25.0),
+                                child: new Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    new Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        new Text(
+                                          'Nombre de pods',
+                                          style: TextStyle(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )),
+                            Padding(
+                                padding: EdgeInsets.only(
+                                    left: 25.0, right: 25.0, top: 2.0),
+                                child: new Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Flexible(
+                                      child: FutureBuilder<DocumentSnapshot>(
+                                          future: firestore
+                                              .getCurrentUser(_user.uid),
+                                          builder: (context, snapshot) {
+                                            if (!snapshot.hasData) {
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            }
+                                            int podsCount = 0;
+                                            if (newPodsCount == -1) {
+                                              Map<String, dynamic> data =
+                                                  snapshot.data!.data()
+                                                      as Map<String, dynamic>;
+                                              podsCount = data['podsCount'];
+                                            } else {
+                                              podsCount = newPodsCount;
+                                            }
+                                            return Column(
+                                              children: [
+                                                Slider(
+                                                  value: podsCount.toDouble(),
+                                                  min: 0,
+                                                  max: 6,
+                                                  divisions: 6,
+                                                  label: podsCount
+                                                      .round()
+                                                      .toString(),
+                                                  activeColor: CustomTheme
+                                                      .loginGradientStart,
+                                                  inactiveColor: CustomTheme
+                                                      .greyBackground,
+                                                  onChanged: _status
+                                                      ? null
+                                                      : (double value) {
+                                                          setState(() {
+                                                            newPodsCount =
+                                                                value.toInt();
+                                                          });
+                                                        },
+                                                ),
+                                                Text(
+                                                  podsCount.toInt().toString(),
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }),
+                                    ),
+                                  ],
+                                )),
+                            !_status ? _getActionButtons() : new Container(),
+                          ],
                         ),
                       ),
-                      Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          child: new ElevatedButton(
-                            child: Text('Se déconnecter'),
-                            style: ElevatedButton.styleFrom(
-                                primary: CustomTheme.TrainingPodsRed,
-                                onPrimary: Colors.black,
-                                shape: new RoundedRectangleBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(20.0))),
-                            onPressed: () async {
-                              await Authentication.signOut(context: context);
-                              Navigator.of(context)
-                                  .pushReplacement(_routeToSignInScreen());
-                            },
-                          ))
-                    ],
-                  ),
+                    )
+                  ],
                 ),
-                new Container(
-                  color: Colors.white24,
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: 25.0),
-                    child: new Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                            padding: EdgeInsets.only(
-                                left: 25.0, right: 25.0, top: 25.0),
-                            child: new Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              mainAxisSize: MainAxisSize.max,
-                              children: <Widget>[
-                                new Text(
-                                  'Informations',
-                                  style: TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                _status ? _getEditIcon() : new Container()
-                              ],
-                            )),
-                        Padding(
-                            padding: EdgeInsets.only(
-                                left: 25.0, right: 25.0, top: 25.0),
-                            child: new Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: <Widget>[
-                                new Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    new Text(
-                                      'Nom',
-                                      style: TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )),
-                        Padding(
-                            padding: EdgeInsets.only(
-                                left: 25.0, right: 25.0, top: 2.0),
-                            child: new Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: <Widget>[
-                                new Flexible(
-                                  child: StreamBuilder(
-                                      stream:
-                                          auth.getInstance().userChanges(),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.data != null) {
-                                          this._user = snapshot.data as User;
-                                          this.nameTFController.text =
-                                              this._user.displayName ?? "";
-                                        }
-                                        return new TextField(
-                                          controller: nameTFController,
-                                          enabled: !_status,
-                                          autofocus: !_status,
-                                        );
-                                      }),
-                                ),
-                              ],
-                            )),
-                        Padding(
-                            padding: EdgeInsets.only(
-                                left: 25.0, right: 25.0, top: 25.0),
-                            child: new Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: <Widget>[
-                                new Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    new Text(
-                                      'Nombre de pods',
-                                      style: TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )),
-                        Padding(
-                            padding: EdgeInsets.only(
-                                left: 25.0, right: 25.0, top: 2.0),
-                            child: new Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: <Widget>[
-                                Flexible(
-                                  child: FutureBuilder<DocumentSnapshot>(
-                                      future: firestore.getCurrentUser(_user.uid),
-                                      builder: (context, snapshot) {
-                                        if (!snapshot.hasData) {
-                                          return Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        }
-                                        int podsCount = 0;
-                                        if (newPodsCount == -1) {
-                                          Map<String, dynamic> data =
-                                              snapshot.data!.data()
-                                                  as Map<String, dynamic>;
-                                          podsCount = data['podsCount'];
-                                        } else {
-                                          podsCount = newPodsCount;
-                                        }
-                                        return Column(
-                                          children: [
-                                            Slider(
-                                              value: podsCount.toDouble(),
-                                              min: 0,
-                                              max: 6,
-                                              divisions: 6,
-                                              label:
-                                                  podsCount.round().toString(),
-                                              activeColor: CustomTheme.loginGradientStart,
-                                              inactiveColor: Colors.grey,
-                                              onChanged: _status
-                                                  ? null
-                                                  : (double value) {
-                                                      setState(() {
-                                                        newPodsCount =
-                                                            value.toInt();
-                                                      });
-                                                    },
-                                            ),
-                                            Text(
-                                              podsCount.toInt().toString(),
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      }),
-                                ),
-                              ],
-                            )),
-                        !_status ? _getActionButtons() : new Container(),
-                      ],
-                    ),
-                  ),
-                )
               ],
             ),
-          ],
-        ),
-      ),
-    ));
+          ),
+        ));
   }
 
   void _onImageButtonPressed(ImageSource source,
@@ -336,7 +347,6 @@ class MapScreenState extends State<ProfileView>
         await _picker.getImage(source: source, imageQuality: 100);
     if (pickedFile != null) {
       try {
-
         imgFile = File(pickedFile.path);
         await storage.uploadUserProfilePicture(_user.uid, imgFile);
         String imgURL = await storage.getUserProfilePicture(_user.uid);
@@ -371,7 +381,7 @@ class MapScreenState extends State<ProfileView>
                 child: Text('Valider'),
                 style: ElevatedButton.styleFrom(
                     primary: CustomTheme.loginGradientStart,
-                    onPrimary: Colors.black,
+                    onPrimary: CustomTheme.black,
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(20.0))),
                 onPressed: () async {
@@ -388,6 +398,7 @@ class MapScreenState extends State<ProfileView>
                     _status = true;
                     FocusScope.of(context).requestFocus(new FocusNode());
                   });
+                  analytics.setUserProperty("podsCount", newPodsCount);
                 },
               )),
             ),
@@ -400,8 +411,8 @@ class MapScreenState extends State<ProfileView>
                   child: new ElevatedButton(
                 child: Text('Annuler'),
                 style: ElevatedButton.styleFrom(
-                    primary: CustomTheme.TrainingPodsRed,
-                    onPrimary: Colors.black,
+                    primary: CustomTheme.paleRed,
+                    onPrimary: CustomTheme.black,
                     shape: new RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(20.0))),
                 onPressed: () {
@@ -424,7 +435,7 @@ class MapScreenState extends State<ProfileView>
       child: Text('Modifier'),
       style: ElevatedButton.styleFrom(
           primary: CustomTheme.loginGradientStart,
-          onPrimary: Colors.black,
+          onPrimary: CustomTheme.black,
           shape: new RoundedRectangleBorder(
               borderRadius: new BorderRadius.circular(20.0))),
       onPressed: () {

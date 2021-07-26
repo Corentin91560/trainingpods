@@ -17,8 +17,7 @@ import 'package:http/http.dart' as http;
 import 'globals.dart';
 
 class Authentication {
-  static Future<FirebaseApp> initializeFirebase(BuildContext context) async {
-    FirebaseApp firebaseApp = await Firebase.initializeApp();
+  static Future<void> initializeFirebase(BuildContext context) async {
     User? user = auth.getCurrentUser();
 
     if (user != null) {
@@ -37,7 +36,6 @@ class Authentication {
         );
       }
     }
-    return firebaseApp;
   }
 
   static Future<User?> signIn(
@@ -51,6 +49,7 @@ class Authentication {
           await auth.signInWithEmailAndPassword(email, password);
       user = userCredential.user!;
 
+      analytics.logEvent(name: "manualConnection");
       Navigator.pushReplacement(
         context,
         PageTransition(
@@ -74,7 +73,6 @@ class Authentication {
       required String name}) async {
     User user;
     try {
-      print("DEBUG ");
       UserCredential userCredential =
           await auth.signUpWithEmailAndPassword(email, password);
       user = userCredential.user!;
@@ -147,6 +145,7 @@ class Authentication {
     } catch (e) {
       snackBarCreator(context, e.toString());
     }
+    analytics.logEvent(name: "facebookConnection");
     return user;
   }
 
@@ -164,6 +163,7 @@ class Authentication {
     } catch (e) {
       snackBarCreator(context, e.toString());
     }
+    analytics.logEvent(name: "googleConnection");
     return user;
   }
 

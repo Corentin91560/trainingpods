@@ -3,7 +3,7 @@ import 'package:trainingpods/theme.dart';
 
 class CustomSnackBar {
   CustomSnackBar(BuildContext context, Widget content,
-      { SnackBarAction? snackBarAction, Color backgroundColor = CustomTheme.TrainingPodsRed}) {
+      { SnackBarAction? snackBarAction, Color backgroundColor = CustomTheme.paleRed}) {
     final SnackBar snackBar = SnackBar(
         action: snackBarAction,
         backgroundColor: backgroundColor,
