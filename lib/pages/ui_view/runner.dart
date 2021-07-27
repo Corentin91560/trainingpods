@@ -42,11 +42,11 @@ class _RunnerState extends State<Runner> {
   }
 
   Future<void> runScenario() async {
-    for (var p in pods) {
+    for (var p in linkedPods) {
       p.write(0);
     }
     for (int a in actions) {
-      await pods[a - 1].run();
+      await linkedPods[a - 1].run();
       Future.delayed(const Duration(milliseconds: 100));
     }
     endScenario();
@@ -62,7 +62,7 @@ class _RunnerState extends State<Runner> {
   }
 
   Future<void> stopScenario() async {
-    for (var pod in pods) {
+    for (var pod in linkedPods) {
       await pod.write(3);
     }
   }
@@ -202,21 +202,5 @@ class _RunnerState extends State<Runner> {
     var ms = ((milliseconds % 999) % 100).toString().padLeft(2, '0');
 
     return "$minutes:$seconds:$ms";
-  }
-
-  void finishScenario() {
-    firestore.createRecord(auth.getCurrentUser()!.uid, widget.scenario,
-        new Record(DateTime.now(), _stopwatch!.elapsedMilliseconds));
-    Navigator.pushReplacement(
-      context,
-      PageTransition(
-          alignment: Alignment.bottomCenter,
-          curve: Curves.easeInOut,
-          duration: Duration(milliseconds: 600),
-          reverseDuration: Duration(milliseconds: 600),
-          type: PageTransitionType.fade,
-          child: HomeScreen(),
-          childCurrent: this.widget),
-    );
   }
 }

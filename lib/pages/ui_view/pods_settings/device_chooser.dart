@@ -16,11 +16,11 @@ class DeviceChooser extends StatefulWidget {
 
 class _DeviceChooserState extends State<DeviceChooser> {
   final FlutterBlue flutterBlue = FlutterBlue.instance;
-  late List<BluetoothDevice> devicesList;
+  late List<BluetoothDevice> scannedDevicesList;
 
   @override
   void initState() {
-    devicesList = [];
+    scannedDevicesList = [];
 
     flutterBlue.scanResults.listen((List<ScanResult> results) {
       for (ScanResult result in results) {
@@ -70,9 +70,9 @@ class _DeviceChooserState extends State<DeviceChooser> {
 
   _addDeviceTolist(final BluetoothDevice device) {
     if (mounted) {
-      if (!devicesList.contains(device)) {
+      if (!scannedDevicesList.contains(device)) {
         setState(() {
-          devicesList.add(device);
+          scannedDevicesList.add(device);
         });
       }
     }
@@ -80,18 +80,19 @@ class _DeviceChooserState extends State<DeviceChooser> {
 
   ListView _buildListViewOfDevices() {
     List<Widget> devicesListView = [];
-    List<BluetoothDevice> toRemove = [];
+    List<BluetoothDevice> devicesToRemove = [];
 
-    for (var tp in pods) {
-      for (var d in devicesList) {
-        if (tp.pod == d) {
-          toRemove.add(d);
+    for (var tp in linkedPods) {
+      for (var d in scannedDevicesList) {
+        if (tp.bleDevice == d) {
+          devicesToRemove.add(d);
         }
       }
     }
-    devicesList.removeWhere((element) => toRemove.contains(element));
 
-    for (BluetoothDevice device in devicesList) {
+    scannedDevicesList.removeWhere((element) => devicesToRemove.contains(element));
+
+    for (BluetoothDevice device in scannedDevicesList) {
       devicesListView.add(
         Card(
           child: Container(
@@ -117,13 +118,13 @@ class _DeviceChooserState extends State<DeviceChooser> {
                     ),
                     style: ElevatedButton.styleFrom(
                         primary: CustomTheme.paleGreen,
-                        onPrimary: Colors.black,
+                        onPrimary: CustomTheme.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         )),
                     onPressed: () async {
                       flutterBlue.stopScan();
-                      pods.add(TrainingPod(device, false, pods.length + 1));
+                      linkedPods.add(TrainingPod(device, false, linkedPods.length + 1));
                       Navigator.of(context).pushReplacement(PageTransition(
                           alignment: Alignment.bottomCenter,
                           curve: Curves.easeInOut,

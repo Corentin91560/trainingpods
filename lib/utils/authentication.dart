@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:trainingpods/pages/home_page.dart';
-import 'package:trainingpods/pages/login_page.dart';
+import 'package:trainingpods/pages/ui_view/sign_in_view.dart';
 import 'package:trainingpods/widgets/snackbar.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:path_provider/path_provider.dart';
@@ -42,7 +42,7 @@ class Authentication {
       {required BuildContext context,
       required String email,
       required String password}) async {
-    User user;
+    User? user;
 
     try {
       UserCredential userCredential =
@@ -83,7 +83,6 @@ class Authentication {
 
       user.updateProfile(
           displayName: email.substring(0, lastIndex), photoURL: picture);
-
       await firestore.createUser(user.uid);
 
       Navigator.pushReplacement(
@@ -94,7 +93,7 @@ class Authentication {
             duration: Duration(milliseconds: 600),
             reverseDuration: Duration(milliseconds: 600),
             type: PageTransitionType.fade,
-            child: LoginPage(),
+            child: SignIn(),
             childCurrent: context.widget),
       );
     } on FirebaseAuthException catch (e) {

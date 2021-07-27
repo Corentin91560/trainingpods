@@ -28,9 +28,9 @@ class _PodsSettingsViewState extends State<PodsSettingsView> {
             padding: EdgeInsets.only(right: 20.0),
             child: GestureDetector(
               onTap: () {
-                for (var tp in pods) {
-                  tp.pod.disconnect();
-                  tp.isConnected = false;
+                for (var pod in linkedPods) {
+                  pod.bleDevice.disconnect();
+                  pod.isConnected = false;
                 }
                 Navigator.pushReplacement(
                   context,
@@ -57,9 +57,9 @@ class _PodsSettingsViewState extends State<PodsSettingsView> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: pods.length > 0
+          child: linkedPods.length > 0
               ? ListView.builder(
-                  itemCount: pods.length,
+                  itemCount: linkedPods.length,
                   itemBuilder: (context, index) {
                     return Card(
                       child: Container(
@@ -75,9 +75,9 @@ class _PodsSettingsViewState extends State<PodsSettingsView> {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
                                 child: Text(
-                                  pods[index].pod.name != ""
-                                      ? pods[index].pod.name
-                                      : pods[index].pod.id.toString(),
+                                  linkedPods[index].bleDevice.name != ""
+                                      ? linkedPods[index].bleDevice.name
+                                      : linkedPods[index].bleDevice.id.toString(),
                                   style: TextStyle(
                                     fontFamily: 'RobotoBold',
                                   ),
@@ -86,7 +86,7 @@ class _PodsSettingsViewState extends State<PodsSettingsView> {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 10),
                                 child: Text(
-                                  pods[index].pod.id.toString(),
+                                  linkedPods[index].bleDevice.id.toString(),
                                   style: TextStyle(
                                       fontFamily: 'Roboto',
                                       fontSize: 12,
@@ -103,7 +103,7 @@ class _PodsSettingsViewState extends State<PodsSettingsView> {
                                           borderRadius:
                                               new BorderRadius.circular(30.0),
                                         ),
-                                        primary: pods[index].isConnected
+                                        primary: linkedPods[index].isConnected
                                             ? CustomTheme.paleRed
                                             : CustomTheme.paleGreen,
                                         textStyle: TextStyle(
@@ -112,35 +112,35 @@ class _PodsSettingsViewState extends State<PodsSettingsView> {
                                         ),
                                       ),
                                       onPressed: () {
-                                        if (pods[index].isConnected) {
-                                          pods[index]
-                                              .pod
+                                        if (linkedPods[index].isConnected) {
+                                          linkedPods[index]
+                                              .bleDevice
                                               .disconnect()
                                               .whenComplete(() {
                                             setState(() {
-                                              pods[index].isConnected = false;
+                                              linkedPods[index].isConnected = false;
                                             });
                                           });
                                         } else {
-                                          pods[index]
-                                              .pod
+                                          linkedPods[index]
+                                              .bleDevice
                                               .connect()
                                               .whenComplete(() {
-                                            pods[index]
-                                                .pod
+                                            linkedPods[index]
+                                                .bleDevice
                                                 .discoverServices()
-                                                .then((value) => pods[index]
-                                                        .characteristic =
+                                                .then((value) => linkedPods[index]
+                                                        .bleCharacteristic =
                                                     value[0]
                                                         .characteristics[0]);
                                             setState(() {
-                                              pods[index].isConnected = true;
+                                              linkedPods[index].isConnected = true;
                                             });
                                           });
                                         }
                                       },
                                       child: Text(
-                                        pods[index].isConnected
+                                        linkedPods[index].isConnected
                                             ? "Deconnecter"
                                             : "Connecter",
                                         style: TextStyle(
@@ -154,12 +154,12 @@ class _PodsSettingsViewState extends State<PodsSettingsView> {
                                     padding: const EdgeInsets.all(10.0),
                                     child: GestureDetector(
                                       onTap: () async {
-                                        if (pods[index].isConnected) {
-                                          await pods[index].pod.disconnect();
-                                          pods[index].isConnected = false;
+                                        if (linkedPods[index].isConnected) {
+                                          await linkedPods[index].bleDevice.disconnect();
+                                          linkedPods[index].isConnected = false;
                                         }
                                         setState(() {
-                                          pods.remove(pods[index]);
+                                          linkedPods.remove(linkedPods[index]);
                                         });
                                       },
                                       child: Icon(

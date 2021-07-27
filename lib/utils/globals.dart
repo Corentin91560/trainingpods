@@ -19,34 +19,37 @@ facebook_auth fbAuth = new facebook_auth();
 google_auth googleAuth = new google_auth();
 firebase_firestore firestore = new firebase_firestore();
 firebase_storage storage = new firebase_storage();
-List<TrainingPod> pods = [];
+List<TrainingPod> linkedPods = [];
 
 void firebaseErrorThrower(FirebaseException e, BuildContext context) {
   switch (e.code) {
     case 'account-exists-with-different-credential':
-      snackBarCreator(context, 'The account already exists with a different credential.');
+      snackBarCreator(context, 'Ce compte existe déjà');
       break;
     case 'user-not-found':
-      snackBarCreator(context, 'SError occurred while accessing credentials. Try again.');
-      break;
-    case 'user-not-found':
-      snackBarCreator(context, 'No user found for that email.');
+      snackBarCreator(
+          context, 'Aucun utilisateur trouvé pour cette adresse mail');
       break;
     case 'wrong-password':
-      snackBarCreator(context, 'Wrong password provided for that user.');
+      snackBarCreator(context, 'Mot de passe erroné');
       break;
     case 'permission-denied':
-      snackBarCreator(context, 'User does not have permission to upload to this reference.');
+      snackBarCreator(context,
+          'Vous n\'avez pas la permission nécessaire pour cette action');
       break;
-    default : {
-      snackBarCreator(context, e.toString());
-    }
+    default:
+      {
+        snackBarCreator(context, e.toString());
+      }
   }
 }
 
 void snackBarCreator(BuildContext context, String text) {
   CustomSnackBar(
     context,
-    Text(text),
+    Text(
+      text,
+      textAlign: TextAlign.center,
+    ),
   );
 }

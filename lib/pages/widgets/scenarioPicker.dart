@@ -50,12 +50,12 @@ class _scenarioPickerState extends State<scenarioPicker> {
                     return GestureDetector(
                       onTap: () {
                         int contextError = 0;
-                        if(pods.length != scenarios[index].podsCount) {
+                        if(linkedPods.length != scenarios[index].podsCount) {
                           contextError = 1;
                           errorHandler(contextError);
                         }
 
-                        for(var pod in pods) {
+                        for(var pod in linkedPods) {
                           if(pod.isConnected == false) {
                             contextError = 2;
                             errorHandler(contextError);

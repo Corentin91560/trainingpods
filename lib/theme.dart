@@ -20,8 +20,6 @@ class CustomTheme {
   static const Color bronze = Color(0xFFb08d57);
   static const Color silver = Color(0xFFC0C0C0);
   static const Color gold = Color(0xFFFFD700);
-
-
   static const Color loginGradientEnd = Color(0xFF0096c7);
   static const Color loginGradientStart = Color(0xFFd9ed92);
 
